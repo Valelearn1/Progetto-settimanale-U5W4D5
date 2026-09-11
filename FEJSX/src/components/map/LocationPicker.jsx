@@ -1,41 +1,61 @@
 import { useState } from 'react'
-import { MapContainer, Marker, TileLayer, useMap, useMapEvents } from 'react-leaflet'
-import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
+import { APIProvider, AdvancedMarker, Map, useMap } from '@vis.gl/react-google-maps'
 import { reverseGeocode, searchAddress } from '../../api/geo'
 import { Icon } from '../ui/Icon'
 import { Alert } from '../ui/Alert'
 import './map.css'
 
 // Vista iniziale: l'Italia intera, finche' non si sceglie un punto.
-const DEFAULT_CENTER = [42.5, 12.5]
+const DEFAULT_CENTER = { lat: 42.5, lng: 12.5 }
 const DEFAULT_ZOOM = 5
+const PICKED_ZOOM = 15
 
-// Leaflet userebbe un'immagine caricata da un CDN: qui il marcatore e'
-// un elemento HTML stilizzato col CSS del tema, cosi' non servono
-// risorse esterne.
-const pinIcon = L.divIcon({
-  className: '',
-  html: '<div class="pin-marker"></div>',
-  iconSize: [32, 32],
-  iconAnchor: [16, 32],
-})
+const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
+// Serve a Google per gli "Advanced Marker" (i marcatori personalizzati).
+// "DEMO_MAP_ID" e' l'identificativo di prova messo a disposizione da Google.
+const MAP_ID = import.meta.env.VITE_GOOGLE_MAPS_MAP_ID ?? 'DEMO_MAP_ID'
 
-// Intercetta i click sulla mappa: e' il modo "scegli un punto".
-function ClickHandler({ onPick }) {
-  useMapEvents({
-    click(event) {
-      onPick(event.latlng.lat, event.latlng.lng)
-    },
-  })
+// Sposta la mappa quando la posizione cambia da ricerca o da GPS.
+// Deve stare dentro <Map> per poter accedere all'istanza.
+function Recenter({ position }) {
+  const map = useMap()
+  const [last, setLast] = useState(null)
+
+  const key = position ? `${position.lat},${position.lng}` : null
+  if (map && key && key !== last) {
+    setLast(key)
+    map.panTo(position)
+    if ((map.getZoom() ?? 0) < PICKED_ZOOM) map.setZoom(PICKED_ZOOM)
+  }
   return null
 }
 
-// Sposta la mappa quando la posizione cambia da ricerca o da GPS.
-function Recenter({ position }) {
-  const map = useMap()
-  if (position) map.flyTo(position, Math.max(map.getZoom(), 14), { duration: 0.8 })
-  return null
+function PickerMap({ position, onPick }) {
+  return (
+    <Map
+      className="picker__map"
+      mapId={MAP_ID}
+      defaultCenter={position ?? DEFAULT_CENTER}
+      defaultZoom={position ? PICKED_ZOOM : DEFAULT_ZOOM}
+      gestureHandling="greedy"
+      disableDefaultUI={false}
+      streetViewControl={false}
+      mapTypeControl={false}
+      fullscreenControl={false}
+      // Click sulla mappa: e' il modo "scegli un punto".
+      onClick={(event) => {
+        const latLng = event.detail?.latLng
+        if (latLng) onPick(latLng.lat, latLng.lng)
+      }}
+    >
+      <Recenter position={position} />
+      {position && (
+        <AdvancedMarker position={position} title="Posizione scelta">
+          <div className="pin-marker" />
+        </AdvancedMarker>
+      )}
+    </Map>
+  )
 }
 
 export function LocationPicker({ value, onChange }) {
@@ -44,8 +64,16 @@ export function LocationPicker({ value, onChange }) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState(null)
 
-  const position = value ? [Number(value.latitude), Number(value.longitude)] : null
+  const position = value
+    ? { lat: Number(value.latitude), lng: Number(value.longitude) }
+    : null
 
+  /*
+    La ricerca e il geocoding inverso passano dal NOSTRO backend, non
+    dalle API di Google: la Geocoding API di Google richiede un account
+    di fatturazione attivo, mentre la mappa qui sopra no. Il backend usa
+    Nominatim (OpenStreetMap), che e' gratuito.
+  */
   async function handleSearch() {
     if (!query.trim()) return
 
@@ -63,7 +91,6 @@ export function LocationPicker({ value, onChange }) {
     }
   }
 
-  // Click sulla mappa: dalle coordinate si risale all'indirizzo.
   async function handleMapPick(lat, lng) {
     setBusy(true)
     setError(null)
@@ -100,8 +127,8 @@ export function LocationPicker({ value, onChange }) {
     <div>
       {/*
         Volutamente un <div> e non un <form>: questo componente vive
-        dentro il form di creazione del post, e l'HTML non ammette
-        form annidati. Con un form interno, premere Invio o la lente
+        dentro il form di creazione del post, e l'HTML non ammette form
+        annidati. Con un form interno, premere Invio o la lente
         invierebbe il post invece di cercare l'indirizzo.
       */}
       <div className="picker__search">
@@ -160,20 +187,16 @@ export function LocationPicker({ value, onChange }) {
 
       {error && <Alert variant="error">{error}</Alert>}
 
-      <MapContainer
-        center={position ?? DEFAULT_CENTER}
-        zoom={position ? 14 : DEFAULT_ZOOM}
-        className="picker__map"
-        scrollWheelZoom
-      >
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-        />
-        <ClickHandler onPick={handleMapPick} />
-        <Recenter position={position} />
-        {position && <Marker position={position} icon={pinIcon} />}
-      </MapContainer>
+      {API_KEY ? (
+        <APIProvider apiKey={API_KEY}>
+          <PickerMap position={position} onPick={handleMapPick} />
+        </APIProvider>
+      ) : (
+        <Alert variant="error" title="Mappa non disponibile">
+          Manca <code>VITE_GOOGLE_MAPS_API_KEY</code> in <code>.env.local</code>.
+          Puoi comunque cercare un indirizzo o usare la tua posizione.
+        </Alert>
+      )}
 
       {value ? (
         <div className="picker__selected">

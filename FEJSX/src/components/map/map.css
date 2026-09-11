@@ -39,7 +39,6 @@
   border-radius: var(--radius-lg);
   overflow: hidden;
   border: 1px solid var(--border);
-  z-index: 0;
 }
 
 .picker__selected {
@@ -79,14 +78,19 @@
   color: var(--danger);
 }
 
-/* Il marcatore: una goccia col gradiente del tramonto. */
+/*
+  Il marcatore: una goccia col gradiente del tramonto.
+  Google posiziona l'Advanced Marker per il suo centro, quindi si
+  sposta verso l'alto di mezza altezza perche' la punta cada
+  esattamente sulle coordinate scelte.
+*/
 .pin-marker {
   display: grid;
   place-items: center;
   width: 2rem;
   height: 2rem;
   border-radius: 50% 50% 50% 0;
-  transform: rotate(-45deg);
+  transform: rotate(-45deg) translate(0.55rem, -0.55rem);
   background: var(--gradient-sunset);
   border: 2px solid #fff;
   box-shadow: var(--shadow-lg);
@@ -98,15 +102,4 @@
   height: 0.5rem;
   border-radius: var(--radius-full);
   background: #fff;
-}
-
-/* Adatta i controlli di Leaflet al tema scuro. */
-:root[data-theme='dark'] .picker__map .leaflet-tile {
-  filter: brightness(0.75) saturate(0.9) hue-rotate(-8deg);
-}
-
-:root[data-theme='dark'] .picker__map .leaflet-control-zoom a {
-  background: var(--bg-elevated);
-  color: var(--text);
-  border-color: var(--border);
 }

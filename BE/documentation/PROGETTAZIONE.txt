@@ -19,23 +19,37 @@ SCELTE TECNICHE:
 
 - Storage dei file/foto: dentro cartella "uploads" (filesystem locale)
 - OCR: Tesseract
-- Mappe: Leaflet + OpenStreetMap, geocoding con Nominatim
+- Mappe: Google Maps (mappa) + Nominatim/OpenStreetMap (geocoding)
 
-Perché non Google Maps:
-Google Maps Platform ha una fascia di utilizzo gratuita, ma per
-accedervi richiede comunque un account di fatturazione collegato al
-progetto Cloud, cioè una carta di credito registrata. Senza, tutte le
-richieste vengono rifiutate (REQUEST_DENIED) e la mappa JavaScript si
-vede con la scritta "for development purposes only" sopra.
-Nominatim (OpenStreetMap) offre lo stesso servizio senza chiave e
-senza carta; in cambio chiede di identificare l'applicazione con uno
-User-Agent e di non superare 1 richiesta al secondo, entrambe cose
-gestite dal backend.
-Il codice è scritto in modo che il provider si possa cambiare da
-configurazione: esiste un'interfaccia GeocodingService con due
-implementazioni (Nominatim e Google), e si sceglie quale usare con la
-proprietà app.geocoding.provider. Se un giorno si attiva il billing,
-si torna a Google cambiando una riga.
+Perché due servizi diversi per la mappa:
+Provando la chiave API sul campo è emerso che i servizi di Google
+Maps non si comportano tutti allo stesso modo:
+
+  - Maps JavaScript API (la mappa che si vede e su cui si clicca):
+    FUNZIONA con una chiave senza account di fatturazione.
+  - Geocoding API (cercare un indirizzo, e il percorso inverso da
+    coordinate a indirizzo): NON funziona, risponde REQUEST_DENIED
+    e chiede di attivare la fatturazione sul progetto Cloud, cioè di
+    registrare una carta di credito.
+
+Quindi il progetto usa la mappa di Google per la parte visiva, e per
+la conversione indirizzo/coordinate passa dal proprio backend, che a
+sua volta interroga Nominatim (OpenStreetMap): gratuito, senza chiave
+e senza carta. In cambio Nominatim chiede di identificare
+l'applicazione con uno User-Agent e di non superare una richiesta al
+secondo, entrambe cose gestite dal backend.
+
+Il codice è scritto in modo che il provider di geocoding si possa
+cambiare da configurazione: esiste un'interfaccia GeocodingService
+con due implementazioni (Nominatim e Google), e si sceglie quale
+usare con la proprietà app.geocoding.provider. Se un giorno si attiva
+la fatturazione, si passa a Google cambiando una riga.
+
+Nota sulla chiave: la chiave della Maps JavaScript API è per forza
+visibile nel browser, perché è il browser stesso a doverla usare. Si
+protegge limitandola per referrer HTTP dalla console Google Cloud, non
+nascondendola. La chiave del geocoding invece, se un giorno servirà,
+resta solo sul backend e non viene mai spedita al browser.
 
 
 ORDINE DI PROGETTAZIONE / SVILUPPO:
