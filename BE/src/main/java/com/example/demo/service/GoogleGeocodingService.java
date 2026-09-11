@@ -4,6 +4,7 @@ import com.example.demo.dto.response.GeocodeResult;
 import com.example.demo.exception.GeocodingException;
 import com.example.demo.exception.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import tools.jackson.core.JacksonException;
@@ -16,7 +17,13 @@ import java.util.List;
 
 // Chiama la Geocoding API di Google direttamente dal backend: la
 // chiave non viene mai spedita al browser, resta solo qui.
+//
+// Non attiva di default: Google Maps Platform richiede un account di
+// fatturazione collegato al progetto Cloud (quindi una carta
+// registrata) anche per restare nella fascia gratuita. Per usarla,
+// mettere app.geocoding.provider=google in application.properties.
 @Service
+@ConditionalOnProperty(name = "app.geocoding.provider", havingValue = "google")
 public class GoogleGeocodingService implements GeocodingService {
 
     private final RestClient restClient;

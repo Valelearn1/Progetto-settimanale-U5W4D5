@@ -19,7 +19,23 @@ SCELTE TECNICHE:
 
 - Storage dei file/foto: dentro cartella "uploads" (filesystem locale)
 - OCR: Tesseract
-- Mappe: Google Maps Platform, API key gratuita
+- Mappe: Leaflet + OpenStreetMap, geocoding con Nominatim
+
+Perché non Google Maps:
+Google Maps Platform ha una fascia di utilizzo gratuita, ma per
+accedervi richiede comunque un account di fatturazione collegato al
+progetto Cloud, cioè una carta di credito registrata. Senza, tutte le
+richieste vengono rifiutate (REQUEST_DENIED) e la mappa JavaScript si
+vede con la scritta "for development purposes only" sopra.
+Nominatim (OpenStreetMap) offre lo stesso servizio senza chiave e
+senza carta; in cambio chiede di identificare l'applicazione con uno
+User-Agent e di non superare 1 richiesta al secondo, entrambe cose
+gestite dal backend.
+Il codice è scritto in modo che il provider si possa cambiare da
+configurazione: esiste un'interfaccia GeocodingService con due
+implementazioni (Nominatim e Google), e si sceglie quale usare con la
+proprietà app.geocoding.provider. Se un giorno si attiva il billing,
+si torna a Google cambiando una riga.
 
 
 ORDINE DI PROGETTAZIONE / SVILUPPO:
@@ -170,8 +186,9 @@ Controller Geo
 GET CercaIndirizzo
   Input:  testo cercato (es. "Via Roma 1 Torino")
   Output: lista di indirizzi trovati, con coordinate
-  Servizio: chiama la Geocoding API di Google dal backend, così la
-  chiave dell'API non viene mai esposta nel browser
+  Servizio: chiama il servizio di geocoding dal backend e non dal
+  browser, così un'eventuale chiave non viene mai esposta e il limite
+  di richieste si può controllare in un punto solo
 
 GET IndirizzoDaCoordinate
   Input:  latitudine, longitudine
