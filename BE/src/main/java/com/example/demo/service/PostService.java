@@ -8,6 +8,7 @@ import com.example.demo.entity.Location;
 import com.example.demo.entity.Photo;
 import com.example.demo.entity.Post;
 import com.example.demo.entity.enums.CaptureMode;
+import com.example.demo.exception.ForbiddenException;
 import com.example.demo.exception.InvalidFileException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.PostRepository;
@@ -122,7 +123,7 @@ public class PostService {
 
     @Transactional
     public PostResponse update(UUID id, PostUpdateRequest request) {
-        Post post = findPostOrThrow(id);
+        Post post = findOwnPostOrThrow(id);
         post.setText(request.text());
         post.setLocation(toLocation(request.location()));
         return PostResponse.from(postRepository.saveAndFlush(post));
@@ -130,7 +131,7 @@ public class PostService {
 
     @Transactional
     public void delete(UUID id) {
-        Post post = findPostOrThrow(id);
+        Post post = findOwnPostOrThrow(id);
         for (Photo photo : post.getPhotos()) {
             fileStorageService.delete(photo.getFilePath());
         }
@@ -145,7 +146,7 @@ public class PostService {
 
     @Transactional
     public PostResponse addPhoto(UUID postId, MultipartFile file) {
-        Post post = findPostOrThrow(postId);
+        Post post = findOwnPostOrThrow(postId);
         if (post.getCaptureMode() == CaptureMode.CAMERA) {
             throw new IllegalArgumentException("un post creato con la fotocamera puo' avere una sola foto");
         }
@@ -175,7 +176,7 @@ public class PostService {
 
     @Transactional
     public PostResponse removePhoto(UUID postId, UUID photoId) {
-        Post post = findPostOrThrow(postId);
+        Post post = findOwnPostOrThrow(postId);
         Photo photo = post.getPhotos().stream()
                 .filter(p -> p.getId().equals(photoId))
                 .findFirst()
@@ -196,6 +197,20 @@ public class PostService {
     private Post findPostOrThrow(UUID id) {
         return postRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Post non trovato: " + id));
+    }
+
+    /*
+      Trova il post e verifica che appartenga a chi sta chiamando.
+      Senza questo controllo un utente autenticato potrebbe modificare
+      o cancellare i post di chiunque altro: essere collegati non
+      basta, bisogna anche esserne i proprietari.
+    */
+    private Post findOwnPostOrThrow(UUID id) {
+        Post post = findPostOrThrow(id);
+        if (!post.getUser().getId().equals(currentUserService.getCurrentUser().getId())) {
+            throw new ForbiddenException("Questo post non e' tuo");
+        }
+        return post;
     }
 
     private void validateCaptureModeRule(CaptureMode captureMode, int photoCount) {

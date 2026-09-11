@@ -1,27 +1,28 @@
 package com.example.demo.service;
 
-import com.example.demo.config.DataSeeder;
 import com.example.demo.entity.User;
-import com.example.demo.exception.ResourceNotFoundException;
-import com.example.demo.repository.UserRepository;
+import com.example.demo.exception.UnauthorizedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-// Unico punto del codice che sa "chi e' l'utente che sta operando".
-// Oggi restituisce sempre l'utente finto creato da DataSeeder; in
-// fase 9, quando arriva JWT, questo e' l'unico metodo da riscrivere
-// (leggera' l'utente dal token invece che dal seed) senza toccare
-// nessun altro service.
+/*
+  Unico punto del codice che sa "chi e' l'utente che sta operando".
+
+  Fino alla fase 7 restituiva un utente finto creato all'avvio; ora
+  legge l'utente dal token JWT, messo nel contesto di sicurezza da
+  JwtAuthFilter. Nessun altro service e' stato toccato: era
+  esattamente lo scopo di tenere questo metodo in un posto solo.
+*/
 @Service
 public class CurrentUserService {
 
-    private final UserRepository userRepository;
-
-    public CurrentUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
-
     public User getCurrentUser() {
-        return userRepository.findByUsername(DataSeeder.DEMO_USERNAME)
-                .orElseThrow(() -> new ResourceNotFoundException("Utente demo non trovato"));
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || !(authentication.getPrincipal() instanceof User user)) {
+            throw new UnauthorizedException("Devi accedere per compiere questa operazione");
+        }
+        return user;
     }
 }
