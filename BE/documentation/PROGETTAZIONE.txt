@@ -1,0 +1,219 @@
+PROGETTAZIONE - SOCIAL NETWORK DIDATTICO
+
+REQUISITI FUNZIONALI:
+
+1. Creazione post con foto: o una singola foto scattata dalla fotocamera
+   integrata, o una o più foto caricate come upload.
+
+2. Validazione del formato dei file, fatta sul serio sia lato frontend
+   che lato backend.
+
+3. Posizione associata al post: selezionabile cercando un indirizzo o
+   scegliendo un punto sulla mappa. Coordinate e indirizzo appartengono
+   al Post, non alla fotografia.
+
+4. Documenti sul profilo, processati da OCR per estrarne il testo.
+
+
+SCELTE TECNICHE:
+
+- Storage dei file/foto: dentro cartella "uploads" (filesystem locale)
+- OCR: Tesseract
+- Mappe: Google Maps Platform, API key gratuita
+
+
+ORDINE DI PROGETTAZIONE / SVILUPPO:
+
+1. Configurazione Properties
+2. Configurazione CORS su 5173
+3. Verifica Websocket
+4. Creazione DB
+5. Post con foto
+6. Mappa
+7. OCR
+8. Registrazione / Login
+9. Security / JWT
+
+Le fasi 5, 6 e 7 lavorano con un utente "finto" creato appositamente,
+perché la registrazione/login e la sicurezza arrivano solo alla fine
+(fase 8 e 9). Questo permette di costruire prima la parte più
+importante del progetto (il post con la foto) senza dover già avere
+un sistema di login funzionante.
+
+
+ENTITÀ:
+
+User
+----
+- id            UUID
+- nomeCompleto  String
+- username      String (UNIQUE)
+- email         String (UNIQUE)
+- password      String (salvata come hash, non in chiaro)
+- createdAt     Instant
+
+Un utente può creare tanti post e caricare tanti documenti (1:N).
+
+
+Post
+----
+- id            UUID
+- text          String (il testo del post)
+- location      Location (Optional)
+- captureMode   ENUM (CAMERA, UPLOAD) (Optional) - se la foto viene
+                dalla fotocamera o da un upload da file. Vuoto se il
+                post non ha foto, perché in quel caso non ha senso
+- createdAt     Instant
+- updatedAt     Instant
+- idUtente      UUID (1:N - un utente può creare tanti post, ma
+                ogni post è legato a un solo utente)
+
+
+Regola: le foto sono facoltative, un post di solo testo è valido.
+        se captureMode = CAMERA, il post può avere una sola foto.
+        se captureMode = UPLOAD, il post può averne diverse.
+        se il post non ha foto, captureMode resta vuoto.
+
+
+Location (Optional)
+-------------------------------------------------------------
+- latitude      BigDecimal
+- longitude     BigDecimal
+- address       String (indirizzo leggibile, es. "Via Roma 1, Torino")
+
+Perché Location è "dentro" il Post e non è una entità separata:
+la posizione appartiene al post ("il post è stato pubblicato da
+qui"), non è un dato che si vuole riusare tra più post. Quindi le
+sue colonne finiscono direttamente dentro la tabella dei post, senza
+bisogno di una tabella e di una relazione in più.
+
+Perché BigDecimal e non Double per le coordinate:
+Double è un numero a virgola mobile e non rappresenta i decimali in
+modo esatto (es. 45.464200 può diventare leggermente diverso dopo
+essere stato salvato e riletto dal database). Questo crea problemi
+quando si confrontano due coordinate o quando si usano come chiave
+di ricerca. BigDecimal invece è un numero decimale esatto, adatto a
+dati come le coordinate dove la precisione conta.
+
+
+Photo
+-----
+- id            UUID
+- idPost        UUID (1:N - un post può avere più foto, ogni foto
+                appartiene a un solo post)
+- filePath      String (percorso del file dentro la cartella uploads)
+- contentType   String
+- sizeBytes     long (dimensione del file in byte)
+- position      int (ordine di visualizzazione tra le foto dello
+                stesso post)
+- createdAt     Instant
+
+Nota importante: la posizione appartiene al post, non allo fotografia.
+
+
+Document
+--------
+- id            UUID
+- idUtente      UUID (1:N - un utente può caricare più documenti)
+- filePath      String
+- contentType   String
+- sizeBytes     long
+- extractedText String (il testo estratto dall'OCR, calcolato subito
+                al momento del caricamento; può essere vuoto se il
+                documento non conteneva testo leggibile)
+- createdAt     Instant
+
+
+
+CONTROLLER / ENDPOINT:
+
+Controller Post
+----------------
+
+POST CreaPost
+  Input:  text, captureMode (solo se ci sono foto), location
+          (opzionale), foto (opzionali, una o più)
+  Output: il post creato, completo di foto e posizione
+  Servizio: controlla tutte le foto prima di salvarne anche una sola
+  (così se una è invalida non si salva niente a metà), poi scrive
+  i file dentro la cartella uploads e crea il post con le sue foto.
+
+GET ListaPost
+  Output: elenco dei post, i più recenti prima, con paginazione
+
+GET DettaglioPost
+  Input:  id del post
+  Output: il post con testo, posizione e foto
+
+PUT ModificaPost
+  Input:  id del post, nuovo testo e/o nuova posizione
+  Servizio: aggiorna solo i dati di testo, non tocca le foto
+
+DELETE EliminaPost
+  Input:  id del post
+  Servizio: cancella il post dal database E i file delle sue foto
+  dalla cartella uploads
+
+POST AggiungiFoto
+  Input:  id del post, nuova foto
+  Servizio: aggiunge una foto a un post già esistente creato in
+  modalità UPLOAD
+
+DELETE RimuoviFoto
+  Input:  id del post, id della foto
+  Servizio: rimuove una singola foto sia dal database che dal disco
+
+
+Controller Geo
+---------------
+
+GET CercaIndirizzo
+  Input:  testo cercato (es. "Via Roma 1 Torino")
+  Output: lista di indirizzi trovati, con coordinate
+  Servizio: chiama la Geocoding API di Google dal backend, così la
+  chiave dell'API non viene mai esposta nel browser
+
+GET IndirizzoDaCoordinate
+  Input:  latitudine, longitudine
+  Output: indirizzo corrispondente
+  Servizio: come sopra ma al contrario, converte un punto sulla
+  mappa in un indirizzo leggibile
+
+
+Controller Documenti
+----------------------
+
+POST CaricaDocumento
+  Input:  file (PDF o immagine)
+  Output: il documento salvato, già con il testo estratto
+  Servizio: salva il file, esegue subito l'OCR e risponde solo
+  quando l'estrazione del testo è finita (vedi sezione OCR)
+
+GET MieiDocumenti
+  Output: elenco dei documenti dell'utente, con il testo estratto
+
+GET DettaglioDocumento
+  Input:  id del documento
+  Output: il documento con il testo estratto
+
+DELETE EliminaDocumento
+  Input:  id del documento
+  Servizio: cancella record e file
+
+
+Controller Auth (fase 8 e 9)
+-------------------------------
+
+POST Registrazione
+  Input:  nome completo, username, email, password
+  Servizio: controlla che username ed email non siano già usati,
+  salva la password come hash (mai in chiaro)
+
+POST Login
+  Input:  username/email, password
+  Output: token JWT
+  Servizio: verifica le credenziali e restituisce il token da usare
+  nelle richieste successive
+
+
+
