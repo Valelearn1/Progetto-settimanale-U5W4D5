@@ -11,6 +11,9 @@ public record DocumentResponse(
         String contentType,
         long sizeBytes,
         String extractedText,
+        // Valorizzato solo se il documento e' allegato a un post:
+        // serve al frontend per mostrare l'etichetta "allegato a un post".
+        UUID postId,
         Instant createdAt
 ) {
     public static DocumentResponse from(Document document) {
@@ -20,6 +23,7 @@ public record DocumentResponse(
                 document.getContentType(),
                 document.getSizeBytes(),
                 document.getExtractedText(),
+                document.getPost() == null ? null : document.getPost().getId(),
                 document.getCreatedAt()
         );
     }

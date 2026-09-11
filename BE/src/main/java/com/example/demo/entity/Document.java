@@ -39,6 +39,12 @@ public class Document {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    // Facoltativo: se valorizzato il documento e' allegato a quel post
+    // e compare nel feed; se vuoto resta solo nell'archivio del profilo.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "post_id")
+    private Post post;
+
     @Column(name = "file_path", nullable = false)
     private String filePath;
 

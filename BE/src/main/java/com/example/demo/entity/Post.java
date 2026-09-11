@@ -77,6 +77,14 @@ public class Post {
     @OrderBy("position ASC")
     private List<Photo> photos = new ArrayList<>();
 
+    // Documenti allegati al post. Niente orphanRemoval: staccando un
+    // documento dal post questo torna nell'archivio del profilo,
+    // non viene cancellato.
+    @Builder.Default
+    @OneToMany(mappedBy = "post")
+    @OrderBy("createdAt ASC")
+    private List<Document> documents = new ArrayList<>();
+
     // Helper per tenere sincronizzati i due lati della relazione
     // quando si aggiunge/rimuove una foto (serve a CreaPost e
     // AggiungiFoto/RimuoviFoto).

@@ -36,13 +36,16 @@ public class PostController {
     }
 
     // CreaPost: la parte "post" e' JSON (testo, captureMode, location
-    // opzionale); "photos" sono i file, facoltativi (un post di solo
-    // testo e' valido) e da 1 a 10 se presenti.
+    // opzionale); "photos" e "documents" sono file, entrambi
+    // facoltativi (un post di solo testo e' valido).
+    // Attenzione: ogni documento passa dall'OCR, che e' sincrono,
+    // quindi allegandone si allunga il tempo di risposta.
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<PostResponse> create(
             @RequestPart("post") @Valid PostCreateRequest request,
-            @RequestPart(value = "photos", required = false) List<MultipartFile> photos) {
-        PostResponse response = postService.create(request, photos);
+            @RequestPart(value = "photos", required = false) List<MultipartFile> photos,
+            @RequestPart(value = "documents", required = false) List<MultipartFile> documents) {
+        PostResponse response = postService.create(request, photos, documents);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

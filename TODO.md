@@ -1,4 +1,4 @@
-# Stato del progetto — Golden Hour
+# Stato del progetto — Bacheca
 
 Social network didattico. Backend Spring Boot + frontend React.
 Aggiornato: 11 settembre 2026.
@@ -12,7 +12,7 @@ Aggiornato: 11 settembre 2026.
 | 1 | Post con foto da fotocamera **o** upload multiplo | ✅ | ✅ |
 | 2 | Validazione formato file su **entrambi** i lati | ✅ | ✅ |
 | 3 | Posizione sul post (indirizzo o punto sulla mappa) | ✅ | ✅ |
-| 4 | Documenti sul profilo con testo estratto da OCR | ✅ | ✅ |
+| 4 | Documenti con testo estratto da OCR (profilo **e** allegati ai post) | ✅ | ✅ |
 
 Tutti e quattro i requisiti sono coperti end-to-end.
 
@@ -25,7 +25,7 @@ Tutti e quattro i requisiti sono coperti end-to-end.
 - [x] **3. Verifica WebSocket** — testato con round-trip STOMP reale, controller di test poi rimosso
 - [x] **4. Creazione DB** — `Progetto-settimanale-U5W4D5`, 4 tabelle generate da Hibernate
 - [x] **5. Post con foto** — 7 endpoint, storage su disco, doppia validazione
-- [x] **6. Mappa / geocoding** — Nominatim attivo, Google pronto ma disattivato
+- [x] **6. Mappa / geocoding** — mappa Google, geocoding via Nominatim dal backend
 - [x] **7. OCR** — Tesseract + PDFBox, sincrono
 - [ ] **8. Registrazione / Login** — da fare
 - [ ] **9. Security / JWT** — da fare
@@ -36,7 +36,7 @@ Tutti e quattro i requisiti sono coperti end-to-end.
 - [x] `Post` → `posts` — text, location embedded, captureMode, timestamps, FK utente
 - [x] `Location` — embedded in `posts`: latitude/longitude `BigDecimal`, address
 - [x] `Photo` → `photos` — filePath, contentType, sizeBytes, position (nessuna coordinata)
-- [x] `Document` → `documents` — filePath, contentType, sizeBytes, extractedText
+- [x] `Document` → `documents` — filePath, contentType, sizeBytes, extractedText, FK post (nullable)
 
 ### Endpoint
 
@@ -67,19 +67,20 @@ Tutti e quattro i requisiti sono coperti end-to-end.
 
 ## Frontend
 
-- [x] Design system "tramonto in spiaggia" — tema chiaro e scuro, interruttore
+- [x] Design system a variabili CSS — tema chiaro e scuro, interruttore
 - [x] Layout con navigazione (Feed / Pubblica / Profilo)
 - [x] Client API con gestione errori dal backend
 - [x] Validazione file con magic bytes
 - [x] Hook fotocamera con spegnimento stream e errori gestiti
 - [x] Form post: tab Scatta/Carica, anteprime, rimozione, contatore caratteri
-- [x] Selettore posizione: ricerca, click sulla mappa, GPS
+- [x] Selettore posizione con **Google Maps**: ricerca, click sulla mappa, GPS
+- [x] Drag & drop per foto e documenti
 - [x] Feed con card, galleria foto adattiva, indirizzo
-- [x] Profilo con upload documenti e testo OCR
+- [x] Profilo con upload documenti e testo OCR (da file o fotocamera)
+- [x] Documenti allegabili a un post, da file o fotocamera, visibili nel feed
 
 ### Da fare / migliorabile
 
-- [ ] **Verificare nel browser** i flussi fotocamera, upload e mappa (finora provata solo la pagina feed)
 - [ ] Pagine di login e registrazione (dipendono dalle fasi 8-9)
 - [ ] Paginazione del feed: ora carica i primi 20 e basta, manca "carica altri"
 - [ ] Interfaccia per `PUT /api/posts/{id}` (modifica post): endpoint pronto, schermata no
@@ -106,15 +107,19 @@ Tutti e quattro i requisiti sono coperti end-to-end.
 - PostgreSQL in locale, database `Progetto-settimanale-U5W4D5`
 - Tesseract installato (`brew install tesseract tesseract-lang`) — già presente
 - Backend su `localhost:8080`, frontend su `localhost:5173`
-- Nessuna chiave API necessaria: le mappe usano OpenStreetMap
+- Chiave Google Maps in `FEJSX/.env.local` (copiare da `.env.example`)
 
 ---
 
 ## Note aperte
 
-- **Google Maps** resta disponibile ma spento: richiede un account di
-  fatturazione con carta anche per la fascia gratuita. Per riattivarlo basta
-  mettere `app.geocoding.provider=google` nelle properties.
+- **Google Maps**: la mappa interattiva funziona con la chiave attuale, senza
+  fatturazione. La *Geocoding API* invece no (risponde `REQUEST_DENIED` e
+  chiede di attivare il billing), quindi ricerca indirizzi e geocoding inverso
+  passano dal backend con Nominatim. Se un giorno si attiva la fatturazione,
+  basta mettere `app.geocoding.provider=google` nelle properties.
+- La chiave Maps sta in `FEJSX/.env.local`, che non è versionato. Chi clona il
+  progetto deve copiare `.env.example` in `.env.local` e inserire la propria.
 - **Credenziali del database** sono scritte in chiaro in
   `application.properties`. Prima della consegna converrebbe spostarle in
   variabili d'ambiente.

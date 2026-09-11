@@ -1,6 +1,14 @@
 import { apiUrl } from '../../api/client'
+import { formatBytes } from '../../utils/fileValidation'
 import { Icon } from '../ui/Icon'
 import './feed.css'
+
+const TYPE_LABELS = {
+  'application/pdf': 'PDF',
+  'image/jpeg': 'JPEG',
+  'image/png': 'PNG',
+  'image/tiff': 'TIFF',
+}
 
 function initials(name = '') {
   return name.slice(0, 2).toUpperCase()
@@ -23,7 +31,7 @@ function galleryClass(count) {
 }
 
 export function PostCard({ post, onDelete }) {
-  const { photos = [], location } = post
+  const { photos = [], documents = [], location } = post
 
   return (
     <article className="post">
@@ -36,7 +44,7 @@ export function PostCard({ post, onDelete }) {
             {post.captureMode === 'CAMERA' && (
               <>
                 <span>·</span>
-                <span title="Scattata sul momento">
+                <span title="Scattata con la fotocamera">
                   <Icon name="camera" size={12} /> scatto
                 </span>
               </>
@@ -67,6 +75,33 @@ export function PostCard({ post, onDelete }) {
             />
           ))}
         </div>
+      )}
+
+      {documents.length > 0 && (
+        <ul className="post__docs">
+          {documents.map((document) => (
+            <li key={document.id} className="post__doc">
+              <a
+                className="post__doc-head"
+                href={apiUrl(document.url)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <Icon name="doc" size={16} className="post__doc-icon" />
+                <span className="post__doc-name">
+                  {TYPE_LABELS[document.contentType] ?? document.contentType}
+                </span>
+                <span className="post__doc-size">{formatBytes(document.sizeBytes)}</span>
+              </a>
+              {document.extractedText?.trim() && (
+                <details className="post__doc-text">
+                  <summary>Testo estratto</summary>
+                  <pre>{document.extractedText}</pre>
+                </details>
+              )}
+            </li>
+          ))}
+        </ul>
       )}
 
       {location && (

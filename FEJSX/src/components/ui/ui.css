@@ -33,7 +33,7 @@
 }
 
 .btn--primary {
-  background: var(--gradient-sunset);
+  background: var(--gradient-accent);
   color: #fff;
   box-shadow: var(--shadow-glow);
 }
@@ -206,7 +206,7 @@
   font-weight: 600;
 }
 
-.chip--sea {
+.chip--secondary {
   background: var(--secondary-soft);
   color: var(--secondary);
 }
@@ -320,7 +320,7 @@
   height: 3rem;
   margin: 0 auto var(--space-3);
   border-radius: var(--radius-full);
-  background: var(--gradient-sunset);
+  background: var(--gradient-accent);
   color: #fff;
   box-shadow: var(--shadow-glow);
   transition: transform 0.15s ease;

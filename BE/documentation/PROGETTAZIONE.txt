@@ -12,7 +12,8 @@ REQUISITI FUNZIONALI:
    scegliendo un punto sulla mappa. Coordinate e indirizzo appartengono
    al Post, non alla fotografia.
 
-4. Documenti sul profilo, processati da OCR per estrarne il testo.
+4. Documenti processati da OCR per estrarne il testo: caricabili
+   nell'archivio del profilo oppure allegati direttamente a un post.
 
 
 SCELTE TECNICHE:
@@ -145,6 +146,9 @@ Document
 --------
 - id            UUID
 - idUtente      UUID (1:N - un utente può caricare più documenti)
+- idPost        UUID (Optional) - se valorizzato il documento è
+                allegato a quel post e compare nel feed; se vuoto
+                resta solo nell'archivio del profilo
 - filePath      String
 - contentType   String
 - sizeBytes     long
@@ -162,11 +166,14 @@ Controller Post
 
 POST CreaPost
   Input:  text, captureMode (solo se ci sono foto), location
-          (opzionale), foto (opzionali, una o più)
-  Output: il post creato, completo di foto e posizione
+          (opzionale), foto (opzionali, una o più), documenti
+          (opzionali, fino a 5)
+  Output: il post creato, completo di foto, documenti e posizione
   Servizio: controlla tutte le foto prima di salvarne anche una sola
   (così se una è invalida non si salva niente a metà), poi scrive
   i file dentro la cartella uploads e crea il post con le sue foto.
+  I documenti allegati passano dall'OCR durante questa stessa
+  richiesta, quindi allegandone la pubblicazione richiede più tempo.
 
 GET ListaPost
   Output: elenco dei post, i più recenti prima, con paginazione
@@ -182,7 +189,9 @@ PUT ModificaPost
 DELETE EliminaPost
   Input:  id del post
   Servizio: cancella il post dal database E i file delle sue foto
-  dalla cartella uploads
+  dalla cartella uploads. I documenti allegati NON vengono
+  cancellati: restano roba dell'utente e tornano nel suo archivio
+  personale (il collegamento al post viene semplicemente svuotato).
 
 POST AggiungiFoto
   Input:  id del post, nuova foto
@@ -221,7 +230,9 @@ POST CaricaDocumento
   quando l'estrazione del testo è finita (vedi sezione OCR)
 
 GET MieiDocumenti
-  Output: elenco dei documenti dell'utente, con il testo estratto
+  Output: elenco di TUTTI i documenti dell'utente, con il testo
+  estratto. Include anche quelli allegati a un post, che vengono
+  contrassegnati come tali
 
 GET DettaglioDocumento
   Input:  id del documento

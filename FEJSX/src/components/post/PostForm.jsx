@@ -1,14 +1,17 @@
 import { useState } from 'react'
 import { createPost } from '../../api/posts'
+import { validateImage } from '../../utils/fileValidation'
 import { CameraCapture } from './CameraCapture'
 import { PhotoUploader } from './PhotoUploader'
 import { PhotoPreviewList } from './PhotoPreviewList'
+import { DocumentPicker } from './DocumentPicker'
 import { LocationPicker } from '../map/LocationPicker'
 import { Icon } from '../ui/Icon'
 import { Alert } from '../ui/Alert'
 import './post.css'
 
 const MAX_PHOTOS = 10
+const MAX_DOCUMENTS = 5
 const MAX_TEXT = 500
 
 export function PostForm({ onPublished }) {
@@ -17,6 +20,7 @@ export function PostForm({ onPublished }) {
   // regola che il backend rifa' in PostService.
   const [captureMode, setCaptureMode] = useState('UPLOAD')
   const [photos, setPhotos] = useState([])
+  const [documents, setDocuments] = useState([])
   const [location, setLocation] = useState(null)
   const [rejected, setRejected] = useState([])
   const [error, setError] = useState(null)
@@ -37,14 +41,27 @@ export function PostForm({ onPublished }) {
     setPhotos((current) => current.filter((_, i) => i !== index))
   }
 
+  // Anche lo scatto passa dalla validazione: e' sempre un JPEG
+  // generato dal canvas, ma cosi' il percorso resta uno solo.
+  async function handleCameraCapture(file) {
+    const check = await validateImage(file)
+    if (!check.ok) {
+      setRejected([{ name: file.name, error: check.error }])
+      return
+    }
+    setRejected([])
+    setPhotos([file])
+  }
+
   async function handleSubmit(event) {
     event.preventDefault()
     setError(null)
     setSending(true)
     try {
-      await createPost({ text: text.trim(), captureMode, location, photos })
+      await createPost({ text: text.trim(), captureMode, location, photos, documents })
       setText('')
       setPhotos([])
+      setDocuments([])
       setLocation(null)
       setRejected([])
       onPublished?.()
@@ -58,10 +75,10 @@ export function PostForm({ onPublished }) {
   return (
     <form className="card card--pad" onSubmit={handleSubmit}>
       <label className="field">
-        <span className="field__label">Racconta il momento</span>
+        <span className="field__label">Testo del post</span>
         <textarea
           className="textarea"
-          placeholder="Il sole sta scendendo dietro gli scogli…"
+          placeholder="Scrivi qualcosa…"
           value={text}
           onChange={(event) => setText(event.target.value)}
           required
@@ -104,7 +121,11 @@ export function PostForm({ onPublished }) {
         <div style={{ marginTop: 'var(--space-4)' }}>
           {captureMode === 'CAMERA' ? (
             photos.length === 0 && (
-              <CameraCapture onCapture={(file) => setPhotos([file])} disabled={sending} />
+              <CameraCapture
+                onCapture={handleCameraCapture}
+                disabled={sending}
+                hint="Con la fotocamera puoi allegare una sola foto. Richiede una connessione sicura: funziona su localhost."
+              />
             )
           ) : (
             <PhotoUploader
@@ -130,9 +151,31 @@ export function PostForm({ onPublished }) {
 
       <section className="composer__section">
         <h3 className="composer__section-title">
+          <Icon name="doc" size={18} />
+          Documenti
+          <span className="chip chip--secondary">facoltativi</span>
+        </h3>
+        <DocumentPicker
+          documents={documents}
+          onChange={setDocuments}
+          onRejected={setRejected}
+          maxDocuments={MAX_DOCUMENTS}
+        />
+        {documents.length > 0 && (
+          <div className="composer__ocr-note">
+            <Alert variant="info">
+              Il testo dei documenti viene estratto durante la pubblicazione, quindi
+              potrebbe volerci qualche secondo in più.
+            </Alert>
+          </div>
+        )}
+      </section>
+
+      <section className="composer__section">
+        <h3 className="composer__section-title">
           <Icon name="pin" size={18} />
-          Dove eri
-          <span className="chip chip--sea">facoltativa</span>
+          Posizione
+          <span className="chip chip--secondary">facoltativa</span>
         </h3>
         <LocationPicker value={location} onChange={setLocation} />
       </section>

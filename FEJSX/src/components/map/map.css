@@ -79,7 +79,7 @@
 }
 
 /*
-  Il marcatore: una goccia col gradiente del tramonto.
+  Il marcatore: una goccia col colore di accento.
   Google posiziona l'Advanced Marker per il suo centro, quindi si
   sposta verso l'alto di mezza altezza perche' la punta cada
   esattamente sulle coordinate scelte.
@@ -91,7 +91,7 @@
   height: 2rem;
   border-radius: 50% 50% 50% 0;
   transform: rotate(-45deg) translate(0.55rem, -0.55rem);
-  background: var(--gradient-sunset);
+  background: var(--gradient-accent);
   border: 2px solid #fff;
   box-shadow: var(--shadow-lg);
 }

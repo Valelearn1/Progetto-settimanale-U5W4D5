@@ -26,25 +26,19 @@ body {
 }
 
 /*
-  Il sole che tramonta dietro il contenuto: una macchia calda in alto
-  che sfuma nel colore di sfondo. Fissa, non scorre con la pagina.
+  Velatura calda in cima alla pagina: stacca l'intestazione dal resto
+  senza usare un bordo netto. Fissa, non scorre con il contenuto.
 */
 body::before {
   content: '';
   position: fixed;
   inset: 0 0 auto 0;
-  height: 60vh;
-  background:
-    radial-gradient(
-      ellipse 80% 100% at 50% 0%,
-      rgba(255, 182, 39, 0.22),
-      transparent 60%
-    ),
-    radial-gradient(
-      ellipse 60% 80% at 85% 10%,
-      rgba(255, 77, 109, 0.16),
-      transparent 65%
-    );
+  height: 40vh;
+  background: radial-gradient(
+    ellipse 90% 100% at 50% 0%,
+    rgba(255, 155, 60, 0.12),
+    transparent 70%
+  );
   pointer-events: none;
   z-index: 0;
 }

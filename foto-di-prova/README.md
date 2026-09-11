@@ -1,8 +1,8 @@
 <div align="center">
 
-# 🌅 Foto di prova
+# 📸 Foto di prova
 
-**Immagini pronte all'uso per testare Golden Hour**
+**Immagini pronte all'uso per testare il progetto**
 
 ![Formati](https://img.shields.io/badge/formati-JPEG%20%7C%20PNG-ff6b35?style=for-the-badge)
 ![Limite](https://img.shields.io/badge/limite-5%20MB%20per%20foto-ffb627?style=for-the-badge)
@@ -133,5 +133,5 @@ il repository.
 ---
 
 <div align="center">
-<sub>🌅 Golden Hour · progetto didattico · React + Spring Boot</sub>
+<sub>📌 Bacheca · progetto didattico · React + Spring Boot</sub>
 </div>

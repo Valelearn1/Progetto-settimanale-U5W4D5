@@ -1,46 +1,55 @@
 /*
-  Golden Hour - sistema di colori "tramonto in spiaggia".
+  Sistema di colori dell'applicazione.
+
   Tutti i colori stanno qui come variabili CSS: i componenti non
-  scrivono mai un colore a mano, cosi' cambiare il tema significa
-  toccare solo questo file.
+  scrivono mai un colore a mano, cosi' cambiare tema significa toccare
+  solo questo file.
+
+  I nomi sono divisi in due gruppi:
+  - la scala grezza (--warm-*, --teal-*, --neutral-*), cioe' i colori
+    in quanto tali;
+  - i ruoli semantici (--bg, --text, --accent...), cioe' a cosa serve
+    ciascun colore. I componenti usano solo questi.
 */
 
 :root {
-  /* --- Cielo al tramonto: dal giallo caldo al rosa corallo --- */
-  --sun-gold: #ffb627;
-  --sun-amber: #ff9f1c;
-  --sun-orange: #ff6b35;
-  --sun-coral: #ff4d6d;
-  --sun-rose: #f7567c;
+  /* --- Scala calda: l'identita' dell'applicazione --- */
+  --warm-100: #ffb627;
+  --warm-200: #ff9f1c;
+  --warm-300: #ff6b35;
+  --warm-400: #ff4d6d;
+  --warm-500: #f7567c;
 
-  /* --- Mare e cielo che si scurisce --- */
-  --sea-teal: #1b9aaa;
-  --sea-deep: #14708a;
-  --dusk-violet: #6a4c93;
-  --dusk-night: #2e1f3d;
+  /* --- Scala fredda: usata come colore secondario --- */
+  --teal-300: #1b9aaa;
+  --teal-500: #14708a;
 
-  /* --- Sabbia --- */
-  --sand-50: #fffaf3;
-  --sand-100: #fff3e4;
-  --sand-200: #ffe8d1;
-  --sand-300: #f6d9bb;
+  /* --- Tinte profonde: sfondi pieni e superfici scure --- */
+  --deep-300: #6a4c93;
+  --deep-500: #2e1f3d;
+
+  /* --- Neutri caldi: sfondi e superfici chiare --- */
+  --neutral-50: #fffaf3;
+  --neutral-100: #fff3e4;
+  --neutral-200: #ffe8d1;
+  --neutral-300: #f6d9bb;
 
   /* --- Ruoli semantici (quelli che usano i componenti) --- */
-  --bg: var(--sand-100);
+  --bg: var(--neutral-100);
   --bg-elevated: #ffffff;
-  --bg-sunken: var(--sand-200);
+  --bg-sunken: var(--neutral-200);
 
   --text: #2e1f3d;
   --text-muted: #7c6a7d;
   --text-faint: #a2919f;
   --text-on-accent: #ffffff;
 
-  --accent: var(--sun-orange);
+  --accent: var(--warm-300);
   --accent-strong: #ef4f18;
   --accent-soft: rgba(255, 107, 53, 0.12);
   --accent-ring: rgba(255, 107, 53, 0.35);
 
-  --secondary: var(--sea-teal);
+  --secondary: var(--teal-300);
   --secondary-soft: rgba(27, 154, 170, 0.12);
 
   --border: #f2dcc4;
@@ -51,20 +60,20 @@
   --success: #1b998b;
   --success-soft: rgba(27, 153, 139, 0.14);
 
-  /* --- Gradienti: il tramonto vero e proprio --- */
-  --gradient-sunset: linear-gradient(
+  /* --- Gradienti --- */
+  --gradient-accent: linear-gradient(
     135deg,
-    var(--sun-gold) 0%,
-    var(--sun-orange) 45%,
-    var(--sun-coral) 100%
+    var(--warm-100) 0%,
+    var(--warm-300) 45%,
+    var(--warm-400) 100%
   );
-  --gradient-dusk: linear-gradient(
+  --gradient-deep: linear-gradient(
     160deg,
-    var(--sun-coral) 0%,
-    var(--dusk-violet) 65%,
-    var(--dusk-night) 100%
+    var(--warm-400) 0%,
+    var(--deep-300) 65%,
+    var(--deep-500) 100%
   );
-  --gradient-sea: linear-gradient(135deg, var(--sea-teal), var(--sea-deep));
+  --gradient-secondary: linear-gradient(135deg, var(--teal-300), var(--teal-500));
 
   /* --- Forme e profondita' --- */
   --radius-sm: 0.5rem;
@@ -96,8 +105,9 @@
 }
 
 /*
-  Tema scuro: la stessa spiaggia dopo il tramonto. Si attiva da solo
-  se il sistema operativo e' in modalita' scura.
+  Tema scuro: si attiva da solo se il sistema operativo e' in
+  modalita' scura, a meno che l'utente non abbia scelto esplicitamente
+  il tema chiaro dall'interruttore.
 */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {

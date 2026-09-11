@@ -21,11 +21,11 @@ export function AppShell({ children }) {
       <header className="header">
         <div className="brand">
           <span className="brand__mark">
-            <Icon name="wave" size={20} strokeWidth={2} color="#fff" />
+            <Icon name="board" size={20} strokeWidth={2} color="#fff" />
           </span>
           <span>
-            <span className="brand__name">Golden Hour</span>
-            <span className="brand__tag">momenti al tramonto</span>
+            <span className="brand__name">Bacheca</span>
+            <span className="brand__tag">post, luoghi e documenti</span>
           </span>
         </div>
 
@@ -52,7 +52,7 @@ export function AppShell({ children }) {
       <main className="main">{children}</main>
 
       <footer className="footer">
-        Golden Hour · progetto didattico · React + Spring Boot
+        Bacheca · progetto didattico · React + Spring Boot
       </footer>
     </div>
   )

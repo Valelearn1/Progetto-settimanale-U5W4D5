@@ -6,9 +6,9 @@ export function NewPostPage() {
 
   return (
     <>
-      <h1 className="page-title">Nuovo momento</h1>
+      <h1 className="page-title">Nuovo post</h1>
       <p className="page-subtitle">
-        Scrivi due righe, allega le foto e segna dove eri.
+        Scrivi il testo, allega le foto e indica la posizione.
       </p>
       <PostForm onPublished={() => navigate('/')} />
     </>

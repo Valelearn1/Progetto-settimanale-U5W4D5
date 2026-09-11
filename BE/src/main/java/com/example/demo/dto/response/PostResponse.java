@@ -16,7 +16,8 @@ public record PostResponse(
         Instant updatedAt,
         UUID userId,
         String username,
-        List<PhotoResponse> photos
+        List<PhotoResponse> photos,
+        List<DocumentResponse> documents
 ) {
     public static PostResponse from(Post post) {
         return new PostResponse(
@@ -28,7 +29,8 @@ public record PostResponse(
                 post.getUpdatedAt(),
                 post.getUser().getId(),
                 post.getUser().getUsername(),
-                post.getPhotos().stream().map(PhotoResponse::from).toList()
+                post.getPhotos().stream().map(PhotoResponse::from).toList(),
+                post.getDocuments().stream().map(DocumentResponse::from).toList()
         );
     }
 }

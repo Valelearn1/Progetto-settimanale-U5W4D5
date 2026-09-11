@@ -90,7 +90,7 @@
   padding: var(--space-5);
   margin-bottom: var(--space-5);
   border-radius: var(--radius-lg);
-  background: var(--gradient-dusk);
+  background: var(--gradient-deep);
   color: #fff;
   box-shadow: var(--shadow-lg);
 }
@@ -120,4 +120,8 @@
 .profile__handle {
   font-size: 0.85rem;
   opacity: 0.8;
+}
+
+.doc__badge {
+  margin-top: var(--space-2);
 }

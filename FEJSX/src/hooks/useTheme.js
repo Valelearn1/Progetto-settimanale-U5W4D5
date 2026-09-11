@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 
-const STORAGE_KEY = 'golden-hour-theme'
+const STORAGE_KEY = 'bacheca-theme'
 
 function initialTheme() {
   const saved = localStorage.getItem(STORAGE_KEY)

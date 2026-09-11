@@ -11,7 +11,7 @@
   aspect-ratio: 4 / 3;
   border-radius: var(--radius-lg);
   overflow: hidden;
-  background: var(--gradient-dusk);
+  background: var(--gradient-deep);
   display: grid;
   place-items: center;
 }
@@ -20,7 +20,15 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* La webcam del computer si vede a specchio: piu' naturale. */
+}
+
+/*
+  Solo l'anteprima viene specchiata, ed e' piu' naturale quando si
+  inquadra se stessi. Per i documenti va disattivata, altrimenti il
+  testo si legge al contrario. Lo scatto salvato non e' mai
+  specchiato: il canvas disegna il fotogramma originale.
+*/
+.camera__video--mirrored {
   transform: scaleX(-1);
 }
 
@@ -158,4 +166,66 @@
 .composer__counter--over {
   color: var(--danger);
   font-weight: 600;
+}
+
+/* --- Documenti in attesa di essere allegati --- */
+
+.attachments {
+  list-style: none;
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.attachment {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg);
+  font-size: 0.85rem;
+}
+
+.attachment__icon {
+  flex-shrink: 0;
+  color: var(--secondary);
+}
+
+.attachment__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.attachment__size {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.attachment__remove {
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: var(--radius-full);
+  color: var(--text-faint);
+}
+
+.attachment__remove:hover {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+/* Avviso sul tempo di attesa dovuto all'OCR */
+.composer__ocr-note {
+  margin-top: var(--space-3);
 }

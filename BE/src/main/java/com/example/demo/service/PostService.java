@@ -33,28 +33,40 @@ import java.util.UUID;
 public class PostService {
 
     private static final int MAX_PHOTOS_PER_POST = 10;
+    private static final int MAX_DOCUMENTS_PER_POST = 5;
     private static final DateTimeFormatter SUBFOLDER_FORMAT = DateTimeFormatter.ofPattern("yyyy/MM");
 
     private final PostRepository postRepository;
     private final CurrentUserService currentUserService;
     private final ImageFileValidator imageFileValidator;
     private final FileStorageService fileStorageService;
+    private final DocumentService documentService;
 
     public PostService(PostRepository postRepository,
                         CurrentUserService currentUserService,
                         ImageFileValidator imageFileValidator,
-                        FileStorageService fileStorageService) {
+                        FileStorageService fileStorageService,
+                        DocumentService documentService) {
         this.postRepository = postRepository;
         this.currentUserService = currentUserService;
         this.imageFileValidator = imageFileValidator;
         this.fileStorageService = fileStorageService;
+        this.documentService = documentService;
     }
 
     @Transactional
-    public PostResponse create(PostCreateRequest request, List<MultipartFile> photos) {
-        // Le foto sono facoltative: un post di solo testo e' valido.
+    public PostResponse create(PostCreateRequest request,
+                                List<MultipartFile> photos,
+                                List<MultipartFile> documents) {
+        // Foto e documenti sono entrambi facoltativi: un post di solo
+        // testo e' valido.
         List<MultipartFile> files = photos == null ? List.of() : photos;
+        List<MultipartFile> docs = documents == null ? List.of() : documents;
         validateCaptureModeRule(request.captureMode(), files.size());
+        if (docs.size() > MAX_DOCUMENTS_PER_POST) {
+            throw new IllegalArgumentException(
+                    "un post puo' avere al massimo " + MAX_DOCUMENTS_PER_POST + " documenti");
+        }
 
         // Si validano TUTTI i file prima di scriverne anche uno solo
         // su disco: cosi' se un file e' invalido non resta nessun
@@ -88,6 +100,14 @@ public class PostService {
         // vengono valorizzati da Hibernate solo al momento del flush
         // verso il DB, e la risposta li deve gia' avere popolati.
         Post saved = postRepository.saveAndFlush(post);
+
+        // I documenti si allegano dopo che il post ha un id. Ognuno
+        // passa dall'OCR, quindi con allegati pesanti la creazione del
+        // post richiede piu' tempo.
+        if (!docs.isEmpty()) {
+            saved.getDocuments().addAll(documentService.storeAll(docs, saved));
+        }
+
         return PostResponse.from(saved);
     }
 
@@ -114,6 +134,12 @@ public class PostService {
         for (Photo photo : post.getPhotos()) {
             fileStorageService.delete(photo.getFilePath());
         }
+        // I documenti allegati non si cancellano: tornano nell'archivio
+        // personale, perche' restano roba dell'utente. Vanno pero'
+        // staccati prima, o la chiave esterna impedirebbe la delete.
+        post.getDocuments().forEach(document -> document.setPost(null));
+        post.getDocuments().clear();
+
         postRepository.delete(post);
     }
 

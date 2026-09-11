@@ -67,7 +67,13 @@ const PATHS = {
       <path d="M12 8v5M12 16.5v.01" />
     </>
   ),
-  wave: <path d="M2 12c2.5 0 2.5-3 5-3s2.5 3 5 3 2.5-3 5-3 2.5 3 5 3M2 18c2.5 0 2.5-3 5-3s2.5 3 5 3 2.5-3 5-3 2.5 3 5 3" />,
+  // Segnaposto sovrapposti: il simbolo dell'applicazione.
+  board: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="4" />
+      <path d="M7 9h10M7 13h6" />
+    </>
+  ),
 }
 
 export function Icon({ name, size = 20, strokeWidth = 1.8, ...props }) {

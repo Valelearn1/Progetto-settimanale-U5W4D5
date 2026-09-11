@@ -2,6 +2,7 @@ package com.example.demo.service;
 
 import com.example.demo.dto.response.DocumentResponse;
 import com.example.demo.entity.Document;
+import com.example.demo.entity.Post;
 import com.example.demo.entity.User;
 import com.example.demo.exception.InvalidFileException;
 import com.example.demo.exception.ResourceNotFoundException;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -40,10 +42,20 @@ public class DocumentService {
         this.ocrService = ocrService;
     }
 
-    // CaricaDocumento: salva il file, esegue subito l'OCR (sincrono)
-    // e risponde solo a estrazione finita.
+    // CaricaDocumento: senza post, finisce solo nell'archivio del profilo.
     @Transactional
     public DocumentResponse upload(MultipartFile file) {
+        return DocumentResponse.from(store(file, null));
+    }
+
+    /*
+      Salva il file, ne estrae il testo con l'OCR e crea il record.
+      Se "post" e' valorizzato, il documento risulta allegato a quel
+      post e comparira' nel feed; se e' null resta nell'archivio
+      personale. Usato sia da CaricaDocumento sia da CreaPost.
+    */
+    @Transactional
+    public Document store(MultipartFile file, Post post) {
         DocumentFileValidator.ValidatedDocument info;
         try {
             info = documentFileValidator.validate(file);
@@ -58,16 +70,26 @@ public class DocumentService {
 
         Document document = Document.builder()
                 .user(currentUserService.getCurrentUser())
+                .post(post)
                 .filePath(stored.relativePath())
                 .contentType(info.contentType())
                 .sizeBytes(stored.sizeBytes())
                 .extractedText(extractedText)
                 .build();
 
-        return DocumentResponse.from(documentRepository.saveAndFlush(document));
+        return documentRepository.saveAndFlush(document);
     }
 
-    // MieiDocumenti
+    @Transactional
+    public List<Document> storeAll(List<MultipartFile> files, Post post) {
+        List<Document> saved = new ArrayList<>();
+        for (MultipartFile file : files) {
+            saved.add(store(file, post));
+        }
+        return saved;
+    }
+
+    // MieiDocumenti: tutto l'archivio, inclusi quelli allegati a un post.
     public List<DocumentResponse> listMine() {
         User user = currentUserService.getCurrentUser();
         return documentRepository.findByUserOrderByCreatedAtDesc(user).stream()

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { Icon } from '../ui/Icon'
 
 /*
@@ -6,15 +6,16 @@ import { Icon } from '../ui/Icon'
   temporaneo al file in memoria. Vanno rilasciati con revokeObjectURL
   quando non servono piu', altrimenti restano occupati finche' la
   pagina non viene ricaricata.
+
+  Gli URL si calcolano durante il render (useMemo) e non dentro un
+  effetto: sono un dato derivato dalle foto, non uno stato a se'.
+  L'effetto serve solo a liberarli quando cambiano o quando il
+  componente sparisce.
 */
 export function PhotoPreviewList({ photos, onRemove }) {
-  const [urls, setUrls] = useState([])
+  const urls = useMemo(() => photos.map((photo) => URL.createObjectURL(photo)), [photos])
 
-  useEffect(() => {
-    const created = photos.map((photo) => URL.createObjectURL(photo))
-    setUrls(created)
-    return () => created.forEach((url) => URL.revokeObjectURL(url))
-  }, [photos])
+  useEffect(() => () => urls.forEach((url) => URL.revokeObjectURL(url)), [urls])
 
   if (photos.length === 0) return null
 
@@ -22,9 +23,7 @@ export function PhotoPreviewList({ photos, onRemove }) {
     <div className="previews">
       {photos.map((photo, index) => (
         <figure key={`${photo.name}-${photo.lastModified}`} className="preview">
-          {urls[index] && (
-            <img src={urls[index]} alt={photo.name} className="preview__img" />
-          )}
+          <img src={urls[index]} alt={photo.name} className="preview__img" />
           <button
             type="button"
             className="preview__remove"

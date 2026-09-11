@@ -1,48 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <defs>
-    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
       <stop offset="0%" stop-color="#ffb627" />
-      <stop offset="55%" stop-color="#ff6b35" />
-      <stop offset="100%" stop-color="#f7567c" />
+      <stop offset="45%" stop-color="#ff6b35" />
+      <stop offset="100%" stop-color="#ff4d6d" />
     </linearGradient>
-    <linearGradient id="sun" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#fff4d6" />
-      <stop offset="100%" stop-color="#ffd166" />
-    </linearGradient>
-    <linearGradient id="sea" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1b9aaa" />
-      <stop offset="100%" stop-color="#14708a" />
-    </linearGradient>
-    <clipPath id="round">
-      <rect width="64" height="64" rx="15" />
-    </clipPath>
   </defs>
 
-  <g clip-path="url(#round)">
-    <!-- cielo -->
-    <rect width="64" height="64" fill="url(#sky)" />
+  <rect width="64" height="64" rx="15" fill="url(#accent)" />
 
-    <!-- sole che scende all'orizzonte -->
-    <circle cx="32" cy="34" r="13" fill="url(#sun)" />
-
-    <!-- mare -->
-    <rect y="38" width="64" height="26" fill="url(#sea)" />
-
-    <!-- riflesso del sole sull'acqua -->
-    <g fill="#ffd166" opacity="0.75">
-      <rect x="24" y="42" width="16" height="2.5" rx="1.25" />
-      <rect x="27" y="48" width="10" height="2.5" rx="1.25" />
-      <rect x="29" y="54" width="6" height="2.5" rx="1.25" />
-    </g>
-
-    <!-- onde -->
-    <path
-      d="M-2 44c6 0 6-3 12-3s6 3 12 3 6-3 12-3 6 3 12 3 6-3 12-3"
-      fill="none"
-      stroke="#ffffff"
-      stroke-opacity="0.35"
-      stroke-width="2"
-      stroke-linecap="round"
-    />
+  <!-- Le righe di un post appuntato sulla bacheca -->
+  <g fill="#ffffff">
+    <rect x="16" y="20" width="32" height="5" rx="2.5" />
+    <rect x="16" y="30" width="32" height="5" rx="2.5" opacity="0.85" />
+    <rect x="16" y="40" width="19" height="5" rx="2.5" opacity="0.7" />
   </g>
 </svg>

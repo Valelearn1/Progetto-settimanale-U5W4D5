@@ -41,7 +41,7 @@ export function ProfilePage() {
 
       <h2 className="page-title">Documenti</h2>
       <p className="page-subtitle">
-        Carica un PDF o una scansione: il testo viene letto automaticamente e
+        Carica un PDF o una scansione: il testo viene estratto automaticamente e
         reso ricercabile.
       </p>
 
