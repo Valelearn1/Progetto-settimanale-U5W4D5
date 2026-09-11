@@ -1,0 +1,229 @@
+/* --- Il composer: la card in cima alla bacheca --- */
+
+.composer {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+
+.composer--open {
+  box-shadow: var(--shadow-lg);
+}
+
+/* Riga iniziale: avatar + invito a scrivere */
+.composer__prompt {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.composer__avatar {
+  width: 2.6rem;
+  height: 2.6rem;
+  flex-shrink: 0;
+  border-radius: var(--radius-full);
+  background: var(--gradient-accent);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.composer__trigger {
+  flex: 1;
+  text-align: left;
+  padding: 0.7rem 1.1rem;
+  border-radius: var(--radius-full);
+  background: var(--bg-sunken);
+  color: var(--text-faint);
+  font-size: 0.95rem;
+  transition: background 0.15s ease;
+}
+
+.composer__trigger:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.composer__body {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+.composer__textarea {
+  width: 100%;
+  min-height: 5.5rem;
+  padding: var(--space-3) 0;
+  border: none;
+  background: none;
+  font-family: inherit;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--text);
+  resize: vertical;
+}
+
+.composer__textarea:focus {
+  outline: none;
+}
+
+.composer__textarea::placeholder {
+  color: var(--text-faint);
+}
+
+/* --- Barra degli strumenti: sempre visibile --- */
+
+.toolbar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.tool {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0.65rem 0.5rem;
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: background 0.15s ease, color 0.15s ease, transform 0.12s ease;
+}
+
+.tool:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.tool--active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.tool__icon {
+  flex-shrink: 0;
+}
+
+/* Pallino col numero di elementi aggiunti */
+.tool__count {
+  min-width: 1.2rem;
+  height: 1.2rem;
+  padding: 0 0.3rem;
+  border-radius: var(--radius-full);
+  background: var(--gradient-accent);
+  color: #fff;
+  font-size: 0.7rem;
+  font-weight: 700;
+  display: grid;
+  place-items: center;
+}
+
+.tool__count--secondary {
+  background: var(--gradient-secondary);
+}
+
+/* --- Pannello dello strumento attivo --- */
+
+.panel {
+  padding: var(--space-4);
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+  animation: panel-in 0.18s ease;
+}
+
+@keyframes panel-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+}
+
+.panel__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-3);
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.panel__hint {
+  margin-left: auto;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-faint);
+}
+
+.panel__close {
+  display: grid;
+  place-items: center;
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: var(--radius-full);
+  color: var(--text-faint);
+}
+
+.panel__close:hover {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+/* --- Riepilogo di cosa è stato allegato --- */
+
+.summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding: 0 var(--space-4) var(--space-3);
+}
+
+/* --- Piede: contatore e pubblica --- */
+
+.composer__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.composer__counter {
+  font-size: 0.78rem;
+  color: var(--text-faint);
+  font-variant-numeric: tabular-nums;
+}
+
+.composer__counter--over {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.composer__footer-actions {
+  margin-left: auto;
+  display: flex;
+  gap: var(--space-2);
+}
+
+@media (max-width: 30rem) {
+  .tool span:not(.tool__count) {
+    display: none;
+  }
+
+  .tool {
+    padding: 0.7rem 0.5rem;
+  }
+}

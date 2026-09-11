@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useCallback, useEffect, useState } from 'react'
 import { deletePost, fetchPosts } from '../api/posts'
+import { Composer } from '../components/post/Composer'
 import { PostCard } from '../components/feed/PostCard'
 import { Icon } from '../components/ui/Icon'
 import { Alert } from '../components/ui/Alert'
@@ -10,12 +10,23 @@ export function FeedPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
+  const load = useCallback(async () => {
+    try {
+      const page = await fetchPosts({ page: 0, size: 20 })
+      setPosts(page.content ?? [])
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
   useEffect(() => {
     // "cancelled" evita di aggiornare lo stato se il componente
     // sparisce mentre la richiesta e' ancora in corso.
     let cancelled = false
 
-    async function load() {
+    async function initialLoad() {
       try {
         const page = await fetchPosts({ page: 0, size: 20 })
         if (!cancelled) setPosts(page.content ?? [])
@@ -26,7 +37,7 @@ export function FeedPage() {
       }
     }
 
-    load()
+    initialLoad()
     return () => {
       cancelled = true
     }
@@ -46,9 +57,8 @@ export function FeedPage() {
   }
 
   return (
-    <>
-      <h1 className="page-title">Bacheca</h1>
-      <p className="page-subtitle">Gli ultimi post pubblicati, dal più recente.</p>
+    <div className="stack">
+      <Composer onPublished={load} />
 
       {error && <Alert variant="error">{error}</Alert>}
 
@@ -61,20 +71,14 @@ export function FeedPage() {
           <span className="empty__icon">
             <Icon name="board" size={24} />
           </span>
-          <h2 className="empty__title">Ancora nessun post</h2>
-          <p>La bacheca è vuota. Pubblica il primo post.</p>
-          <Link to="/nuovo" className="btn btn--primary" style={{ marginTop: 'var(--space-4)' }}>
-            <Icon name="plus" size={18} />
-            Crea un post
-          </Link>
+          <h2 className="empty__title">La bacheca è vuota</h2>
+          <p>Scrivi qualcosa qui sopra per pubblicare il primo post.</p>
         </div>
       ) : (
-        <div className="stack">
-          {posts.map((post) => (
-            <PostCard key={post.id} post={post} onDelete={handleDelete} />
-          ))}
-        </div>
+        posts.map((post) => (
+          <PostCard key={post.id} post={post} onDelete={handleDelete} />
+        ))
       )}
-    </>
+    </div>
   )
 }

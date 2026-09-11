@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { apiUrl } from '../../api/client'
 import { formatBytes } from '../../utils/fileValidation'
 import { Icon } from '../ui/Icon'
@@ -5,9 +6,9 @@ import './feed.css'
 
 const TYPE_LABELS = {
   'application/pdf': 'PDF',
-  'image/jpeg': 'JPEG',
-  'image/png': 'PNG',
-  'image/tiff': 'TIFF',
+  'image/jpeg': 'Immagine JPEG',
+  'image/png': 'Immagine PNG',
+  'image/tiff': 'Immagine TIFF',
 }
 
 function initials(name = '') {
@@ -25,50 +26,63 @@ function relativeTime(isoDate) {
 }
 
 function galleryClass(count) {
-  if (count === 1) return 'post__gallery--1'
-  if (count === 2) return 'post__gallery--2'
-  return 'post__gallery--many'
+  if (count === 1) return 'gallery--1'
+  if (count === 2) return 'gallery--2'
+  if (count === 3) return 'gallery--3'
+  return 'gallery--many'
 }
 
 export function PostCard({ post, onDelete }) {
   const { photos = [], documents = [], location } = post
+  const [confirming, setConfirming] = useState(false)
 
   return (
     <article className="post">
       <header className="post__head">
         <span className="post__avatar">{initials(post.username)}</span>
-        <div>
-          <div className="post__author">@{post.username}</div>
-          <div className="post__meta">
-            <span>{relativeTime(post.createdAt)}</span>
+        <div className="post__who">
+          <span className="post__author">@{post.username}</span>
+          <span className="post__meta">
+            {relativeTime(post.createdAt)}
             {post.captureMode === 'CAMERA' && (
               <>
-                <span>·</span>
-                <span title="Scattata con la fotocamera">
-                  <Icon name="camera" size={12} /> scatto
-                </span>
+                <span className="post__dot">·</span>
+                <Icon name="camera" size={12} />
+                scatto
               </>
             )}
-          </div>
+          </span>
         </div>
-        <button
-          type="button"
-          className="post__delete"
-          onClick={() => onDelete(post.id)}
-          aria-label="Elimina post"
-        >
-          <Icon name="trash" size={16} />
-        </button>
+
+        {confirming ? (
+          <span className="post__confirm">
+            <button type="button" className="btn btn--danger" onClick={() => onDelete(post.id)}>
+              Elimina
+            </button>
+            <button type="button" className="btn btn--ghost" onClick={() => setConfirming(false)}>
+              Annulla
+            </button>
+          </span>
+        ) : (
+          <button
+            type="button"
+            className="post__delete"
+            onClick={() => setConfirming(true)}
+            aria-label="Elimina post"
+          >
+            <Icon name="trash" size={16} />
+          </button>
+        )}
       </header>
 
       {post.text && <p className="post__text">{post.text}</p>}
 
       {photos.length > 0 && (
-        <div className={`post__gallery ${galleryClass(photos.length)}`}>
+        <div className={`gallery ${galleryClass(photos.length)}`}>
           {photos.map((photo) => (
             <img
               key={photo.id}
-              className="post__photo"
+              className="gallery__img"
               src={apiUrl(photo.url)}
               alt=""
               loading="lazy"
@@ -77,38 +91,48 @@ export function PostCard({ post, onDelete }) {
         </div>
       )}
 
-      {documents.length > 0 && (
-        <ul className="post__docs">
+      {(location || documents.length > 0) && (
+        <div className="post__extras">
+          {location && (
+            <a
+              className="post__place"
+              href={`https://www.google.com/maps/search/?api=1&query=${location.latitude},${location.longitude}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              <Icon name="pin" size={15} />
+              {location.address ?? `${location.latitude}, ${location.longitude}`}
+            </a>
+          )}
+
           {documents.map((document) => (
-            <li key={document.id} className="post__doc">
+            <div key={document.id} className="doc-chip">
               <a
-                className="post__doc-head"
+                className="doc-chip__head"
                 href={apiUrl(document.url)}
                 target="_blank"
                 rel="noreferrer"
               >
-                <Icon name="doc" size={16} className="post__doc-icon" />
-                <span className="post__doc-name">
+                <span className="doc-chip__icon">
+                  <Icon name="doc" size={16} />
+                </span>
+                <span className="doc-chip__name">
                   {TYPE_LABELS[document.contentType] ?? document.contentType}
                 </span>
-                <span className="post__doc-size">{formatBytes(document.sizeBytes)}</span>
+                <span className="doc-chip__size">{formatBytes(document.sizeBytes)}</span>
               </a>
               {document.extractedText?.trim() && (
-                <details className="post__doc-text">
-                  <summary>Testo estratto</summary>
+                <details className="doc-chip__text">
+                  <summary>
+                    <Icon name="text" size={13} />
+                    Testo estratto dall&apos;OCR
+                  </summary>
                   <pre>{document.extractedText}</pre>
                 </details>
               )}
-            </li>
+            </div>
           ))}
-        </ul>
-      )}
-
-      {location && (
-        <p className="post__place">
-          <Icon name="pin" size={15} className="post__place-icon" />
-          {location.address ?? `${location.latitude}, ${location.longitude}`}
-        </p>
+        </div>
       )}
     </article>
   )
