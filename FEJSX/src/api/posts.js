@@ -8,7 +8,7 @@ export function fetchPost(id) {
   return apiGet(`/api/posts/${id}`)
 }
 
-export function createPost({ text, captureMode, location, photos }) {
+export function createPost({ text, captureMode, location, photos, documents = [] }) {
   const formData = new FormData()
 
   // La parte "post" e' JSON dentro una richiesta multipart: va
@@ -23,6 +23,9 @@ export function createPost({ text, captureMode, location, photos }) {
     new Blob([JSON.stringify(payload)], { type: 'application/json' }),
   )
   photos.forEach((photo) => formData.append('photos', photo))
+  // Ogni documento passa dall'OCR lato server: con allegati pesanti
+  // questa richiesta puo' durare qualche secondo.
+  documents.forEach((document) => formData.append('documents', document))
 
   return apiSend('/api/posts', { formData })
 }

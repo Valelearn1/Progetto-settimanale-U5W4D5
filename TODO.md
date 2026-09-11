@@ -25,7 +25,7 @@ Tutti e quattro i requisiti sono coperti end-to-end.
 - [x] **3. Verifica WebSocket** — testato con round-trip STOMP reale, controller di test poi rimosso
 - [x] **4. Creazione DB** — `Progetto-settimanale-U5W4D5`, 4 tabelle generate da Hibernate
 - [x] **5. Post con foto** — 7 endpoint, storage su disco, doppia validazione
-- [x] **6. Mappa / geocoding** — mappa Google, geocoding via Nominatim dal backend
+- [x] **6. Mappa / geocoding** — mappa e geocoding Google (API v4, chiave gratuita)
 - [x] **7. OCR** — Tesseract + PDFBox, sincrono
 - [ ] **8. Registrazione / Login** — da fare
 - [ ] **9. Security / JWT** — da fare
@@ -113,11 +113,11 @@ Tutti e quattro i requisiti sono coperti end-to-end.
 
 ## Note aperte
 
-- **Google Maps**: la mappa interattiva funziona con la chiave attuale, senza
-  fatturazione. La *Geocoding API* invece no (risponde `REQUEST_DENIED` e
-  chiede di attivare il billing), quindi ricerca indirizzi e geocoding inverso
-  passano dal backend con Nominatim. Se un giorno si attiva la fatturazione,
-  basta mettere `app.geocoding.provider=google` nelle properties.
+- **Google Maps**: mappa e geocoding funzionano entrambi con la chiave
+  gratuita, senza fatturazione. Il geocoding usa la **API v4**
+  (`geocode.googleapis.com/v4/...`): quella classica invece richiede il
+  billing attivo. Nominatim resta disponibile come alternativa mettendo
+  `app.geocoding.provider=nominatim` nelle properties.
 - La chiave Maps sta in `FEJSX/.env.local`, che non è versionato. Chi clona il
   progetto deve copiare `.env.example` in `.env.local` e inserire la propria.
 - **Credenziali del database** sono scritte in chiaro in

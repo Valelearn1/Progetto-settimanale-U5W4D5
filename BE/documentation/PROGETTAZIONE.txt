@@ -20,37 +20,40 @@ SCELTE TECNICHE:
 
 - Storage dei file/foto: dentro cartella "uploads" (filesystem locale)
 - OCR: Tesseract
-- Mappe: Google Maps (mappa) + Nominatim/OpenStreetMap (geocoding)
+- Mappe: Google Maps (mappa + geocoding con API v4)
 
-Perché due servizi diversi per la mappa:
-Provando la chiave API sul campo è emerso che i servizi di Google
-Maps non si comportano tutti allo stesso modo:
+Perché la Geocoding API v4 e non quella classica:
+Google Maps Platform ha due generazioni di API di geocoding, e si
+comportano in modo diverso rispetto alla fatturazione:
 
-  - Maps JavaScript API (la mappa che si vede e su cui si clicca):
-    FUNZIONA con una chiave senza account di fatturazione.
-  - Geocoding API (cercare un indirizzo, e il percorso inverso da
-    coordinate a indirizzo): NON funziona, risponde REQUEST_DENIED
-    e chiede di attivare la fatturazione sul progetto Cloud, cioè di
-    registrare una carta di credito.
+  - La versione classica (maps.googleapis.com/maps/api/geocode/json)
+    richiede un account di fatturazione attivo sul progetto Cloud,
+    cioè una carta di credito registrata. Senza, risponde
+    REQUEST_DENIED e non restituisce nulla.
+  - La versione v4 (geocode.googleapis.com/v4/geocode/...) funziona
+    con una chiave gratuita, senza fatturazione. È quella che usa il
+    progetto.
 
-Quindi il progetto usa la mappa di Google per la parte visiva, e per
-la conversione indirizzo/coordinate passa dal proprio backend, che a
-sua volta interroga Nominatim (OpenStreetMap): gratuito, senza chiave
-e senza carta. In cambio Nominatim chiede di identificare
-l'applicazione con uno User-Agent e di non superare una richiesta al
-secondo, entrambe cose gestite dal backend.
+Cambia anche il formato delle risposte: la v4 restituisce
+"formattedAddress" e un oggetto "location" con "latitude" e
+"longitude", mentre la classica usava "formatted_address" e
+"geometry.location" con "lat"/"lng".
 
-Il codice è scritto in modo che il provider di geocoding si possa
-cambiare da configurazione: esiste un'interfaccia GeocodingService
-con due implementazioni (Nominatim e Google), e si sceglie quale
-usare con la proprietà app.geocoding.provider. Se un giorno si attiva
-la fatturazione, si passa a Google cambiando una riga.
+Gli indirizzi nella v4 fanno parte del percorso e non sono parametri:
+  ricerca:  /v4/geocode/address/{indirizzo}
+  inverso:  /v4/geocode/location/{latitudine},{longitudine}
 
-Nota sulla chiave: la chiave della Maps JavaScript API è per forza
+Il codice è scritto in modo che il provider si possa cambiare da
+configurazione: esiste un'interfaccia GeocodingService con due
+implementazioni (Google v4 e Nominatim/OpenStreetMap), e si sceglie
+quale usare con la proprietà app.geocoding.provider. Nominatim resta
+disponibile come alternativa senza chiave.
+
+Nota sulle chiavi: la chiave della Maps JavaScript API è per forza
 visibile nel browser, perché è il browser stesso a doverla usare. Si
 protegge limitandola per referrer HTTP dalla console Google Cloud, non
-nascondendola. La chiave del geocoding invece, se un giorno servirà,
-resta solo sul backend e non viene mai spedita al browser.
+nascondendola. La chiave del geocoding invece resta solo sul backend e
+non viene mai spedita al browser.
 
 
 ORDINE DI PROGETTAZIONE / SVILUPPO:

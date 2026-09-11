@@ -37,6 +37,12 @@ export function DocumentCard({ document, onDelete }) {
               minute: '2-digit',
             })}
           </div>
+          {document.postId && (
+            <span className="chip chip--secondary doc__badge">
+              <Icon name="board" size={12} />
+              allegato a un post
+            </span>
+          )}
         </div>
         <button
           type="button"

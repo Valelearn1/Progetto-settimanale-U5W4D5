@@ -101,6 +101,15 @@ public class DocumentService {
         return DocumentResponse.from(findOrThrow(id));
     }
 
+    // Correzione a mano del testo letto dall'OCR, che sbaglia spesso
+    // su scansioni storte o caratteri decorativi.
+    @Transactional
+    public DocumentResponse updateText(UUID id, String extractedText) {
+        Document document = findOrThrow(id);
+        document.setExtractedText(extractedText);
+        return DocumentResponse.from(documentRepository.saveAndFlush(document));
+    }
+
     @Transactional
     public void delete(UUID id) {
         Document document = findOrThrow(id);

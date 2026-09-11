@@ -24,7 +24,7 @@ import java.util.List;
 //  1. un User-Agent che identifichi l'applicazione (senza, bloccano);
 //  2. al massimo 1 richiesta al secondo.
 @Service
-@ConditionalOnProperty(name = "app.geocoding.provider", havingValue = "nominatim", matchIfMissing = true)
+@ConditionalOnProperty(name = "app.geocoding.provider", havingValue = "nominatim")
 public class NominatimGeocodingService implements GeocodingService {
 
     private static final long MIN_INTERVAL_MILLIS = 1000L;

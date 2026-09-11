@@ -11,13 +11,19 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-// La chiave di Google Maps richiede la fatturazione attiva sul
-// progetto Cloud per rispondere davvero (vedi PROGETTAZIONE.txt):
-// questo test verifica il parsing usando risposte JSON di esempio
-// nello stesso formato documentato da Google, senza chiamare la rete.
+/*
+  Verifica il parsing delle risposte della Geocoding API v4 usando
+  JSON di esempio, senza chiamare la rete: cosi' i test restano veloci
+  e non consumano quota.
+
+  Nota sul formato: la v4 usa "formattedAddress" e un oggetto
+  "location" con "latitude"/"longitude", mentre la vecchia API usava
+  "formatted_address" e "geometry.location" con "lat"/"lng".
+*/
 class GoogleGeocodingServiceTest {
 
-    private final GoogleGeocodingService service = new GoogleGeocodingService(new ObjectMapper(), "");
+    private final GoogleGeocodingService service =
+            new GoogleGeocodingService(new ObjectMapper(), "");
 
     @Test
     void parsaUnRisultatoValido() {
@@ -25,13 +31,12 @@ class GoogleGeocodingServiceTest {
                 {
                   "results": [
                     {
-                      "formatted_address": "Piazza del Duomo, 20122 Milano MI, Italy",
-                      "geometry": {
-                        "location": { "lat": 45.4641943, "lng": 9.1918655 }
-                      }
+                      "placeId": "ChIJ34j7SnBtiEcRH3-vac7QRjQ",
+                      "location": { "latitude": 45.0704118, "longitude": 7.6846901 },
+                      "granularity": "ROOFTOP",
+                      "formattedAddress": "Via Roma, 1, 10123 Torino TO, Italia"
                     }
-                  ],
-                  "status": "OK"
+                  ]
                 }
                 """;
 
@@ -39,34 +44,16 @@ class GoogleGeocodingServiceTest {
 
         assertThat(results).hasSize(1);
         GeocodeResult result = results.getFirst();
-        assertThat(result.address()).isEqualTo("Piazza del Duomo, 20122 Milano MI, Italy");
-        // BigDecimal esatto: non 45.464194299999... come sarebbe con un double.
-        assertThat(result.latitude()).isEqualByComparingTo(new BigDecimal("45.4641943"));
-        assertThat(result.longitude()).isEqualByComparingTo(new BigDecimal("9.1918655"));
+        assertThat(result.address()).isEqualTo("Via Roma, 1, 10123 Torino TO, Italia");
+        // BigDecimal esatto: non 45.07041179999... come sarebbe con un double.
+        assertThat(result.latitude()).isEqualByComparingTo(new BigDecimal("45.0704118"));
+        assertThat(result.longitude()).isEqualByComparingTo(new BigDecimal("7.6846901"));
     }
 
     @Test
     void nessunRisultatoRestituisceListaVuota() {
-        String json = """
-                { "results": [], "status": "ZERO_RESULTS" }
-                """;
-
-        assertThat(service.parseResults(json)).isEmpty();
-    }
-
-    @Test
-    void statusDiErroreLanciaGeocodingException() {
-        String json = """
-                {
-                  "results": [],
-                  "status": "REQUEST_DENIED",
-                  "error_message": "You must enable Billing on the Google Cloud Project"
-                }
-                """;
-
-        assertThatThrownBy(() -> service.parseResults(json))
-                .isInstanceOf(GeocodingException.class)
-                .hasMessageContaining("Billing");
+        assertThat(service.parseResults("{}")).isEmpty();
+        assertThat(service.parseResults("{\"results\": []}")).isEmpty();
     }
 
     @Test
@@ -74,13 +61,21 @@ class GoogleGeocodingServiceTest {
         String json = """
                 {
                   "results": [
-                    { "formatted_address": "Via Roma 1, Torino", "geometry": { "location": { "lat": 45.07, "lng": 7.68 } } },
-                    { "formatted_address": "Via Roma 1, Milano", "geometry": { "location": { "lat": 45.46, "lng": 9.19 } } }
-                  ],
-                  "status": "OK"
+                    { "location": { "latitude": 45.07, "longitude": 7.68 }, "formattedAddress": "Torino" },
+                    { "location": { "latitude": 45.46, "longitude": 9.19 }, "formattedAddress": "Milano" }
+                  ]
                 }
                 """;
 
-        assertThat(service.parseResults(json)).hasSize(2);
+        assertThat(service.parseResults(json))
+                .extracting(GeocodeResult::address)
+                .containsExactly("Torino", "Milano");
+    }
+
+    @Test
+    void rispostaNonJsonLanciaGeocodingException() {
+        assertThatThrownBy(() -> service.parseResults("<html>errore</html>"))
+                .isInstanceOf(GeocodingException.class)
+                .hasMessageContaining("Risposta non valida");
     }
 }
