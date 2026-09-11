@@ -4,7 +4,6 @@ import com.example.demo.dto.response.DocumentResponse;
 import com.example.demo.entity.Document;
 import com.example.demo.entity.Post;
 import com.example.demo.entity.User;
-import com.example.demo.exception.ForbiddenException;
 import com.example.demo.exception.InvalidFileException;
 import com.example.demo.exception.ResourceNotFoundException;
 import com.example.demo.repository.DocumentRepository;
@@ -99,21 +98,21 @@ public class DocumentService {
     }
 
     public DocumentResponse getById(UUID id) {
-        return DocumentResponse.from(findOwnOrThrow(id));
+        return DocumentResponse.from(findOrThrow(id));
     }
 
     // Correzione a mano del testo letto dall'OCR, che sbaglia spesso
     // su scansioni storte o caratteri decorativi.
     @Transactional
     public DocumentResponse updateText(UUID id, String extractedText) {
-        Document document = findOwnOrThrow(id);
+        Document document = findOrThrow(id);
         document.setExtractedText(extractedText);
         return DocumentResponse.from(documentRepository.saveAndFlush(document));
     }
 
     @Transactional
     public void delete(UUID id) {
-        Document document = findOwnOrThrow(id);
+        Document document = findOrThrow(id);
         fileStorageService.delete(document.getFilePath());
         documentRepository.delete(document);
     }
@@ -121,18 +120,5 @@ public class DocumentService {
     private Document findOrThrow(UUID id) {
         return documentRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Documento non trovato: " + id));
-    }
-
-    /*
-      Trova il documento e verifica che sia di chi sta chiamando: un
-      documento puo' contenere dati personali, quindi non basta essere
-      autenticati per leggerlo o modificarlo.
-    */
-    private Document findOwnOrThrow(UUID id) {
-        Document document = findOrThrow(id);
-        if (!document.getUser().getId().equals(currentUserService.getCurrentUser().getId())) {
-            throw new ForbiddenException("Questo documento non e' tuo");
-        }
-        return document;
     }
 }
