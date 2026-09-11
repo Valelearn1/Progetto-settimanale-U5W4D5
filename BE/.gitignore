@@ -32,3 +32,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Variabili d'ambiente con credenziali reali
+.env
