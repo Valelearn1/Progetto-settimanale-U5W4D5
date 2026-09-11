@@ -1,0 +1,155 @@
+/*
+  Golden Hour - sistema di colori "tramonto in spiaggia".
+  Tutti i colori stanno qui come variabili CSS: i componenti non
+  scrivono mai un colore a mano, cosi' cambiare il tema significa
+  toccare solo questo file.
+*/
+
+:root {
+  /* --- Cielo al tramonto: dal giallo caldo al rosa corallo --- */
+  --sun-gold: #ffb627;
+  --sun-amber: #ff9f1c;
+  --sun-orange: #ff6b35;
+  --sun-coral: #ff4d6d;
+  --sun-rose: #f7567c;
+
+  /* --- Mare e cielo che si scurisce --- */
+  --sea-teal: #1b9aaa;
+  --sea-deep: #14708a;
+  --dusk-violet: #6a4c93;
+  --dusk-night: #2e1f3d;
+
+  /* --- Sabbia --- */
+  --sand-50: #fffaf3;
+  --sand-100: #fff3e4;
+  --sand-200: #ffe8d1;
+  --sand-300: #f6d9bb;
+
+  /* --- Ruoli semantici (quelli che usano i componenti) --- */
+  --bg: var(--sand-100);
+  --bg-elevated: #ffffff;
+  --bg-sunken: var(--sand-200);
+
+  --text: #2e1f3d;
+  --text-muted: #7c6a7d;
+  --text-faint: #a2919f;
+  --text-on-accent: #ffffff;
+
+  --accent: var(--sun-orange);
+  --accent-strong: #ef4f18;
+  --accent-soft: rgba(255, 107, 53, 0.12);
+  --accent-ring: rgba(255, 107, 53, 0.35);
+
+  --secondary: var(--sea-teal);
+  --secondary-soft: rgba(27, 154, 170, 0.12);
+
+  --border: #f2dcc4;
+  --border-strong: #e6c7a8;
+
+  --danger: #d7263d;
+  --danger-soft: rgba(215, 38, 61, 0.12);
+  --success: #1b998b;
+  --success-soft: rgba(27, 153, 139, 0.14);
+
+  /* --- Gradienti: il tramonto vero e proprio --- */
+  --gradient-sunset: linear-gradient(
+    135deg,
+    var(--sun-gold) 0%,
+    var(--sun-orange) 45%,
+    var(--sun-coral) 100%
+  );
+  --gradient-dusk: linear-gradient(
+    160deg,
+    var(--sun-coral) 0%,
+    var(--dusk-violet) 65%,
+    var(--dusk-night) 100%
+  );
+  --gradient-sea: linear-gradient(135deg, var(--sea-teal), var(--sea-deep));
+
+  /* --- Forme e profondita' --- */
+  --radius-sm: 0.5rem;
+  --radius: 0.875rem;
+  --radius-lg: 1.25rem;
+  --radius-xl: 1.75rem;
+  --radius-full: 9999px;
+
+  --shadow-sm: 0 1px 2px rgba(46, 31, 61, 0.06);
+  --shadow: 0 4px 16px rgba(46, 31, 61, 0.08);
+  --shadow-lg: 0 12px 32px rgba(46, 31, 61, 0.12);
+  --shadow-glow: 0 8px 28px rgba(255, 107, 53, 0.28);
+
+  /* --- Tipografia --- */
+  --font-display: 'Outfit', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+
+  /* --- Spaziature --- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-8: 3rem;
+
+  --header-height: 4.25rem;
+  --content-width: 42rem;
+}
+
+/*
+  Tema scuro: la stessa spiaggia dopo il tramonto. Si attiva da solo
+  se il sistema operativo e' in modalita' scura.
+*/
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #1a1026;
+    --bg-elevated: #251733;
+    --bg-sunken: #140d1e;
+
+    --text: #ffeede;
+    --text-muted: #c4a9bd;
+    --text-faint: #8d7389;
+
+    --accent: #ff7e47;
+    --accent-strong: #ff9463;
+    --accent-soft: rgba(255, 126, 71, 0.16);
+    --accent-ring: rgba(255, 126, 71, 0.4);
+
+    --secondary: #35bacb;
+    --secondary-soft: rgba(53, 186, 203, 0.16);
+
+    --border: #3a2749;
+    --border-strong: #4f3663;
+
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+    --shadow-glow: 0 8px 28px rgba(255, 126, 71, 0.3);
+  }
+}
+
+/* Stessa palette scura, ma forzata dall'interruttore nell'interfaccia. */
+:root[data-theme='dark'] {
+  --bg: #1a1026;
+  --bg-elevated: #251733;
+  --bg-sunken: #140d1e;
+
+  --text: #ffeede;
+  --text-muted: #c4a9bd;
+  --text-faint: #8d7389;
+
+  --accent: #ff7e47;
+  --accent-strong: #ff9463;
+  --accent-soft: rgba(255, 126, 71, 0.16);
+  --accent-ring: rgba(255, 126, 71, 0.4);
+
+  --secondary: #35bacb;
+  --secondary-soft: rgba(53, 186, 203, 0.16);
+
+  --border: #3a2749;
+  --border-strong: #4f3663;
+
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+  --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 8px 28px rgba(255, 126, 71, 0.3);
+}

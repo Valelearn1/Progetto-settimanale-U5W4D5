@@ -1,0 +1,341 @@
+/* --- Superfici --- */
+
+.card {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.card--pad {
+  padding: var(--space-5);
+}
+
+/* --- Bottoni --- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0.65rem 1.15rem;
+  border-radius: var(--radius-full);
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  transition: transform 0.12s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.btn:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+.btn--primary {
+  background: var(--gradient-sunset);
+  color: #fff;
+  box-shadow: var(--shadow-glow);
+}
+
+.btn--ghost {
+  background: var(--bg-elevated);
+  border-color: var(--border-strong);
+  color: var(--text-muted);
+}
+
+.btn--ghost:not(:disabled):hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn--subtle {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.btn--danger {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.btn--block {
+  width: 100%;
+}
+
+.btn--lg {
+  padding: 0.85rem 1.4rem;
+  font-size: 1rem;
+}
+
+/* --- Campi --- */
+
+.field {
+  display: block;
+  margin-bottom: var(--space-4);
+}
+
+.field__label {
+  display: block;
+  margin-bottom: var(--space-2);
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text-muted);
+}
+
+.input,
+.textarea {
+  width: 100%;
+  padding: 0.75rem 0.95rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--border-strong);
+  background: var(--bg);
+  color: var(--text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.input::placeholder,
+.textarea::placeholder {
+  color: var(--text-faint);
+}
+
+.input:focus,
+.textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-ring);
+}
+
+.textarea {
+  min-height: 7rem;
+  resize: vertical;
+  font-family: inherit;
+  line-height: 1.6;
+}
+
+.field__hint {
+  margin-top: var(--space-2);
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}
+
+/* --- Segmenti (le due modalita' foto) --- */
+
+.segmented {
+  display: grid;
+  grid-auto-flow: column;
+  gap: var(--space-1);
+  padding: var(--space-1);
+  background: var(--bg-sunken);
+  border-radius: var(--radius-full);
+}
+
+.segmented__option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: 0.6rem 0.9rem;
+  border-radius: var(--radius-full);
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.segmented__option:hover {
+  color: var(--accent);
+}
+
+.segmented__option--active {
+  background: var(--bg-elevated);
+  color: var(--accent);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- Messaggi --- */
+
+.alert {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius);
+  font-size: 0.88rem;
+  line-height: 1.5;
+}
+
+.alert__icon {
+  flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+.alert--error {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.alert--success {
+  background: var(--success-soft);
+  color: var(--success);
+}
+
+.alert--info {
+  background: var(--secondary-soft);
+  color: var(--secondary);
+}
+
+.alert__list {
+  margin: var(--space-2) 0 0;
+  padding-left: var(--space-4);
+}
+
+/* --- Etichette --- */
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.25rem 0.7rem;
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.chip--sea {
+  background: var(--secondary-soft);
+  color: var(--secondary);
+}
+
+/* --- Stati vuoti / caricamento --- */
+
+.empty {
+  padding: var(--space-8) var(--space-5);
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.empty__icon {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin: 0 auto var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.empty__title {
+  margin-bottom: var(--space-2);
+}
+
+.spinner {
+  width: 1.1em;
+  height: 1.1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: var(--radius-full);
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.page-title {
+  margin-bottom: var(--space-1);
+}
+
+.page-subtitle {
+  margin-bottom: var(--space-5);
+  color: var(--text-muted);
+  font-size: 0.92rem;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+/* --- Area di caricamento --- */
+
+.dropzone {
+  display: block;
+  padding: var(--space-6) var(--space-4);
+  border: 2px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--bg);
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease,
+    box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.dropzone:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+}
+
+/* Mentre si trascina un file sopra l'area. */
+.dropzone--dragging {
+  border-color: var(--accent);
+  border-style: solid;
+  background: var(--accent-soft);
+  box-shadow: 0 0 0 4px var(--accent-ring);
+  transform: scale(1.01);
+}
+
+.dropzone--dragging .dropzone__icon {
+  transform: scale(1.1);
+}
+
+.dropzone--full {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.dropzone--full:hover {
+  border-color: var(--border-strong);
+  background: var(--bg);
+}
+
+/* Impedisce che i figli catturino gli eventi di trascinamento:
+   senza questo, dragleave scatta di continuo passando sopra icona e
+   testo, e l'evidenziazione lampeggia. */
+.dropzone > * {
+  pointer-events: none;
+}
+
+.dropzone__icon {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--gradient-sunset);
+  color: #fff;
+  box-shadow: var(--shadow-glow);
+  transition: transform 0.15s ease;
+}
+
+.dropzone__title {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+.dropzone__hint {
+  display: block;
+  margin-top: var(--space-1);
+  font-size: 0.8rem;
+  color: var(--text-faint);
+}
+

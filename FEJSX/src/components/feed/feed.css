@@ -1,0 +1,130 @@
+.post {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.post__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+}
+
+.post__avatar {
+  width: 2.6rem;
+  height: 2.6rem;
+  border-radius: var(--radius-full);
+  background: var(--gradient-sunset);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  flex-shrink: 0;
+}
+
+.post__author {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  line-height: 1.25;
+}
+
+.post__meta {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}
+
+.post__delete {
+  margin-left: auto;
+  color: var(--text-faint);
+  padding: var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+.post__delete:hover {
+  color: var(--danger);
+  background: var(--danger-soft);
+}
+
+.post__text {
+  padding: 0 var(--space-4) var(--space-4);
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.post__place {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 var(--space-4) var(--space-4);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius);
+  background: var(--secondary-soft);
+  color: var(--secondary);
+  font-size: 0.8rem;
+  font-weight: 500;
+  line-height: 1.35;
+}
+
+.post__place-icon {
+  flex-shrink: 0;
+}
+
+/* Griglia foto: una grande se sola, affiancate se piu' d'una. */
+.post__gallery {
+  display: grid;
+  gap: 2px;
+  background: var(--border);
+}
+
+.post__gallery--1 {
+  grid-template-columns: 1fr;
+}
+
+.post__gallery--2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.post__gallery--many {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.post__photo {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  background: var(--bg-sunken);
+}
+
+.post__gallery--1 .post__photo {
+  aspect-ratio: 16 / 10;
+}
+
+.post__footer {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
+  border-top: 1px solid var(--border);
+}
+
+.feed__toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.feed__count {
+  margin-left: auto;
+  font-size: 0.8rem;
+  color: var(--text-faint);
+}
