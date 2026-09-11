@@ -1,1 +1,12 @@
 .DS_Store
+
+# Configurazione di IntelliJ IDEA: e' legata al singolo computer
+# (percorsi, impostazioni personali, indici) e cambia da sola a ogni
+# apertura del progetto. Non serve a chi scarica il repository.
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Configurazione di Visual Studio Code, per lo stesso motivo
+.vscode/
