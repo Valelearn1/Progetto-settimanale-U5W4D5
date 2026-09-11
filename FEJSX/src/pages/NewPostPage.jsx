@@ -1,6 +1,10 @@
 import { useNavigate } from 'react-router-dom'
-import { PostForm } from '../components/post/PostForm'
+import { Composer } from '../components/post/Composer'
 
+/*
+  Stessa schermata del composer in cima alla bacheca, ma aperta fin
+  da subito: e' la versione a pagina intera, raggiungibile dal menu.
+*/
 export function NewPostPage() {
   const navigate = useNavigate()
 
@@ -8,9 +12,10 @@ export function NewPostPage() {
     <>
       <h1 className="page-title">Nuovo post</h1>
       <p className="page-subtitle">
-        Scrivi il testo, allega le foto e indica la posizione.
+        Scrivi il testo, poi usa i pulsanti qui sotto per allegare foto,
+        documenti o la posizione.
       </p>
-      <PostForm onPublished={() => navigate('/')} />
+      <Composer alwaysOpen onPublished={() => navigate('/')} />
     </>
   )
 }

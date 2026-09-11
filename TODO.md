@@ -72,7 +72,7 @@ Tutti e quattro i requisiti sono coperti end-to-end.
 - [x] Client API con gestione errori dal backend
 - [x] Validazione file con magic bytes
 - [x] Hook fotocamera con spegnimento stream e errori gestiti
-- [x] Form post: tab Scatta/Carica, anteprime, rimozione, contatore caratteri
+- [x] Composer in stile social in cima alla bacheca, con barra strumenti sempre visibile (Foto / Documento / Luogo)
 - [x] Selettore posizione con **Google Maps**: ricerca, click sulla mappa, GPS
 - [x] Drag & drop per foto e documenti
 - [x] Feed con card, galleria foto adattiva, indirizzo
@@ -85,7 +85,7 @@ Tutti e quattro i requisiti sono coperti end-to-end.
 - [ ] Paginazione del feed: ora carica i primi 20 e basta, manca "carica altri"
 - [ ] Interfaccia per `PUT /api/posts/{id}` (modifica post): endpoint pronto, schermata no
 - [ ] Interfaccia per aggiungere/rimuovere foto da un post esistente: endpoint pronti, schermata no
-- [ ] Conferma prima di eliminare un post o un documento (ora cancella subito)
+- [ ] Conferma prima di eliminare un documento (sul post c'è già)
 
 ---
 
