@@ -77,6 +77,7 @@ Tutti e quattro i requisiti sono coperti end-to-end.
 - [x] Drag & drop per foto e documenti
 - [x] Feed con card, galleria foto adattiva, indirizzo
 - [x] Profilo con upload documenti e testo OCR (da file o fotocamera)
+- [x] Correzione a mano del testo estratto dall'OCR
 - [x] Documenti allegabili a un post, da file o fotocamera, visibili nel feed
 
 ### Da fare / migliorabile

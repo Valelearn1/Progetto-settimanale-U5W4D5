@@ -69,7 +69,18 @@ export function ProfilePage() {
           </div>
         ) : (
           documents.map((doc) => (
-            <DocumentCard key={doc.id} document={doc} onDelete={handleDelete} />
+            <DocumentCard
+              key={doc.id}
+              document={doc}
+              onDelete={handleDelete}
+              // Il backend restituisce il documento aggiornato: lo
+              // sostituiamo in elenco senza ricaricare tutto.
+              onUpdated={(updated) =>
+                setDocuments((current) =>
+                  current.map((d) => (d.id === updated.id ? updated : d)),
+                )
+              }
+            />
           ))
         )}
       </div>

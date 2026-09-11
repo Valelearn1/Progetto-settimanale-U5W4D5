@@ -12,6 +12,15 @@ export function uploadDocument(file) {
   return apiSend('/api/documents', { formData })
 }
 
+// L'OCR sbaglia spesso su scansioni storte, caratteri decorativi o
+// sfondi colorati: questo permette di correggere il testo a mano.
+export function updateDocumentText(id, extractedText) {
+  return apiSend(`/api/documents/${id}/text`, {
+    method: 'PATCH',
+    json: { extractedText },
+  })
+}
+
 export function deleteDocument(id) {
   return apiSend(`/api/documents/${id}`, { method: 'DELETE' })
 }

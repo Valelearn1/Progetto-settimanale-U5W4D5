@@ -46,6 +46,7 @@ const PATHS = {
     </>
   ),
   close: <path d="M18 6L6 18M6 6l12 12" />,
+  pencil: <path d="M4 20h4l10-10a2.8 2.8 0 1 0-4-4L4 16v4z" />,
   check: <path d="M20 6L9 17l-5-5" />,
   trash: <path d="M4 7h16M10 11v6M14 11v6M5 7l1 13a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2l1-13M9 7V4h6v3" />,
   doc: (

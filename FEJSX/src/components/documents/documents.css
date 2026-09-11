@@ -125,3 +125,38 @@
 .doc__badge {
   margin-top: var(--space-2);
 }
+
+/* --- Correzione del testo estratto --- */
+
+.doc__edit {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.doc__edit:hover {
+  background: var(--accent);
+  color: #fff;
+}
+
+.doc__textarea {
+  min-height: 9rem;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.doc__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
